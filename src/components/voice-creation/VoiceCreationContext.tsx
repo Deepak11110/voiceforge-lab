@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { Speaker } from '@/services/voiceApi';
+import { Creator } from '@/types/voice';
 
 interface VoiceFormData {
   name: string;
@@ -22,6 +23,8 @@ interface VoiceCreationContextType {
   setAudioFile: React.Dispatch<React.SetStateAction<File | null>>;
   referenceText: string;
   setReferenceText: React.Dispatch<React.SetStateAction<string>>;
+  selectedCreatorId: string;
+  setSelectedCreatorId: React.Dispatch<React.SetStateAction<string>>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
 }
@@ -42,6 +45,7 @@ export const VoiceCreationProvider: React.FC<{ children: React.ReactNode }> = ({
   const [groupSpeakers, setGroupSpeakers] = useState<Speaker[]>([]);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [referenceText, setReferenceText] = useState<string>('');
+  const [selectedCreatorId, setSelectedCreatorId] = useState<string>('current'); // Default to current user
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -65,6 +69,8 @@ export const VoiceCreationProvider: React.FC<{ children: React.ReactNode }> = ({
     setAudioFile,
     referenceText,
     setReferenceText,
+    selectedCreatorId,
+    setSelectedCreatorId,
     handleChange,
     handleSelectChange
   };

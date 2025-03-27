@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Upload, Mic } from 'lucide-react';
 import { useVoiceCreation } from './VoiceCreationContext';
 import { toast } from 'sonner';
+import CreatorSelection from './CreatorSelection';
 
 const InstantVoiceCloning: React.FC = () => {
   const {
@@ -99,6 +100,9 @@ const InstantVoiceCloning: React.FC = () => {
           onChange={handleChange}
         />
       </div>
+      
+      {/* Add the Creator Selection component */}
+      <CreatorSelection />
       
       <div className="border rounded-lg p-6 space-y-4">
         <h3 className="text-sm font-medium">Voice Sample</h3>

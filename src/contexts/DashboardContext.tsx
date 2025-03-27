@@ -127,24 +127,30 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     fetchSpeakersAndCreateVoices();
   }, []);
   
-  // Handle newly created voices
-  const handleVoiceCreated = async () => {
+  // Handle newly created voices with creator assignment
+  const handleVoiceCreated = async (creatorId?: string) => {
     const newVoice = await interactionHandleVoiceCreated();
     
     // Refresh the speakers list
     refetchSpeakers();
     
-    // If a new voice was created, add it to the voices list and assign to current creator
+    // If a new voice was created, add it to the voices list and assign to the specified creator
     if (newVoice) {
+      const creator = creators.find(c => c.id === (creatorId || 'current'));
+      
       const voiceWithCreator = {
         ...newVoice,
-        creatorId: 'current',
-        creatorName: currentCreator.name
+        creatorId: creator?.id || 'current',
+        creatorName: creator?.name || currentCreator.name
       };
       
       setVoices(prev => voiceApi.addVoiceToList(prev, voiceWithCreator));
       setFilteredVoices(prev => voiceApi.addVoiceToList(prev, voiceWithCreator));
+      
+      return voiceWithCreator;
     }
+    
+    return null;
   };
 
   // Creator management functions
@@ -179,6 +185,18 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
 
     setVoices(prev => prev.map(voice => {
+      if (voice.id === voiceId) {
+        return {
+          ...voice,
+          creatorId,
+          creatorName: creator.name
+        };
+      }
+      return voice;
+    }));
+    
+    // Also update filtered voices
+    setFilteredVoices(prev => prev.map(voice => {
       if (voice.id === voiceId) {
         return {
           ...voice,

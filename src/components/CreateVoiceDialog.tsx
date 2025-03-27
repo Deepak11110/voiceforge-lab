@@ -22,6 +22,7 @@ import InstantVoiceCloning from './voice-creation/InstantVoiceCloning';
 import ProfessionalVoiceCloning from './voice-creation/ProfessionalVoiceCloning';
 import { voiceApi } from '@/services/voiceApi';
 import { toast } from 'sonner';
+import { useDashboard } from '@/contexts/DashboardContext';
 
 interface CreateVoiceDialogProps {
   onVoiceCreated: () => void;
@@ -38,8 +39,11 @@ const CreateVoiceDialogContent: React.FC<CreateVoiceDialogProps> = ({ onVoiceCre
     audioFile, 
     referenceText,
     setAudioFile,
-    setReferenceText
+    setReferenceText,
+    selectedCreatorId
   } = useVoiceCreation();
+  
+  const { creators } = useDashboard();
 
   const handleSubmit = async () => {
     // Validation
@@ -63,6 +67,13 @@ const CreateVoiceDialogContent: React.FC<CreateVoiceDialogProps> = ({ onVoiceCre
       return;
     }
     
+    // Get selected creator
+    const creator = creators.find(c => c.id === selectedCreatorId);
+    if (!creator) {
+      toast.error('Selected creator not found');
+      return;
+    }
+    
     setIsCreating(true);
     
     try {
@@ -74,7 +85,7 @@ const CreateVoiceDialogContent: React.FC<CreateVoiceDialogProps> = ({ onVoiceCre
       );
       
       if (uploadResponse.id) {
-        toast.success('Voice created successfully!');
+        toast.success(`Voice "${formData.name}" created successfully and assigned to ${creator.name}!`);
         onVoiceCreated();
         
         // Reset form
