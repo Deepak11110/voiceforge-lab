@@ -1,9 +1,8 @@
-
 import React from 'react';
 import AppHeader from '@/components/dashboard/AppHeader';
 import VoiceDetails from '@/components/VoiceDetails';
 import { useDashboard } from '@/contexts/DashboardContext';
-import { SidebarInset } from '@/components/ui/sidebar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -17,7 +16,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   // Only try to use the dashboard context if we're in a dashboard context page
   const dashboardContext = withDashboardContext ? useDashboard() : null;
   
-  return (
+  const content = (
     <SidebarInset className="bg-background flex flex-col">
       <AppHeader />
       
@@ -32,6 +31,18 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
         />
       )}
     </SidebarInset>
+  );
+
+  // If we're using the dashboard context, we're already within a SidebarProvider from Dashboard.tsx
+  if (withDashboardContext) {
+    return content;
+  }
+  
+  // Otherwise, wrap the content with SidebarProvider
+  return (
+    <SidebarProvider>
+      {content}
+    </SidebarProvider>
   );
 };
 
