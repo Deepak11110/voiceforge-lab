@@ -7,12 +7,31 @@ import { toast } from 'sonner';
 interface ActionButtonsProps {
   audioUrl: string | null;
   isGenerating: boolean;
+  audioId: string | null;
 }
 
 const ActionButtons: React.FC<ActionButtonsProps> = ({ 
   audioUrl, 
-  isGenerating 
+  isGenerating,
+  audioId
 }) => {
+  const handleDownload = () => {
+    if (!audioUrl) return;
+    
+    // Create a temporary link element
+    const link = document.createElement('a');
+    link.href = audioUrl;
+    link.download = `generated-audio-${audioId || 'download'}.wav`;
+    document.body.appendChild(link);
+    
+    // Trigger download
+    link.click();
+    
+    // Clean up
+    document.body.removeChild(link);
+    toast.success('Audio downloaded successfully');
+  };
+  
   return (
     <>
       <Button 
@@ -29,7 +48,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         variant="outline" 
         className="flex-1"
         disabled={!audioUrl || isGenerating}
-        onClick={() => toast.success('Audio downloaded successfully')}
+        onClick={handleDownload}
       >
         <Download className="h-4 w-4 mr-2" />
         Download

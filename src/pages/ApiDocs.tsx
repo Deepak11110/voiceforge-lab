@@ -1,289 +1,373 @@
 
 import React from 'react';
-import DashboardLayout from '@/layouts/DashboardLayout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { CodeBlock } from '@/components/CodeBlock';
 
-const ApiDocs = () => {
+const ApiDocs: React.FC = () => {
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-8">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">API Documentation</h1>
+      <div className="container mx-auto py-6 space-y-8 max-w-5xl">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">API Documentation</h1>
           <p className="text-muted-foreground">
-            Reference documentation for working with our Voice API.
+            Comprehensive documentation for the Voice Generation API
           </p>
         </div>
 
-        <Tabs defaultValue="introduction" className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full md:w-auto">
-            <TabsTrigger value="introduction">Introduction</TabsTrigger>
-            <TabsTrigger value="authentication">Authentication</TabsTrigger>
-            <TabsTrigger value="voices">Voices API</TabsTrigger>
-            <TabsTrigger value="synthesis">Text to Speech</TabsTrigger>
-          </TabsList>
+        <div className="space-y-6">
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold">Introduction</h2>
+            <p>
+              The Voice Generation API allows you to upload reference audio, generate speech from text,
+              and manage speakers. This documentation provides details on how to interact with the API endpoints.
+            </p>
+            
+            <div className="bg-muted p-4 rounded-md">
+              <h3 className="font-medium mb-2">Base URL</h3>
+              <CodeBlock code="https://api.msganesh.com/itts" language="bash" />
+            </div>
+          </section>
 
-          <TabsContent value="introduction">
-            <Card>
-              <CardHeader>
-                <CardTitle>Introduction</CardTitle>
-                <CardDescription>
-                  Get started with our Voice API
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="prose max-w-none">
-                  <p>
-                    Our Voice API gives you access to high-quality voice synthesis capabilities. 
-                    You can use it to create lifelike speech from text, select from multiple voices,
-                    and customize speech parameters.
-                  </p>
-                  
-                  <h3 className="text-lg font-semibold mt-6">Base URL</h3>
-                  <div className="bg-muted p-3 rounded-md font-mono text-sm">
-                    https://api.voiceai.example.com/v1
-                  </div>
-                  
-                  <h3 className="text-lg font-semibold mt-6">Response Format</h3>
-                  <p>
-                    All responses are returned in JSON format. Binary data (such as audio files) 
-                    will be returned as base64-encoded strings or as downloadable links.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="authentication">
-            <Card>
-              <CardHeader>
-                <CardTitle>Authentication</CardTitle>
-                <CardDescription>
-                  Secure your API requests
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="prose max-w-none">
-                  <p>
-                    All API requests must be authenticated using an API key. 
-                    You can get your API key from the Settings page in your account.
-                  </p>
-                  
-                  <h3 className="text-lg font-semibold mt-6">Using API Keys</h3>
-                  <p>
-                    Include your API key in the <code>Authorization</code> header of all requests:
-                  </p>
-                  
-                  <div className="bg-muted p-3 rounded-md font-mono text-sm">
-                    Authorization: Bearer YOUR_API_KEY
-                  </div>
-                  
-                  <h3 className="text-lg font-semibold mt-6">Example Request</h3>
-                  <CodeBlock
-                    code={`curl -X GET https://api.voiceai.example.com/v1/voices \\
-  -H "Authorization: Bearer YOUR_API_KEY"`}
-                    language="bash"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="voices">
-            <Card>
-              <CardHeader>
-                <CardTitle>Voices API</CardTitle>
-                <CardDescription>
-                  Endpoints for managing and listing voices
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold">List All Voices</h3>
-                    <p className="text-muted-foreground mb-2">
-                      Returns a list of all available voices.
-                    </p>
-                    
-                    <div className="bg-muted rounded-md p-2 mb-4">
-                      <div className="flex items-center text-sm">
-                        <span className="bg-green-500 text-white px-2 py-1 rounded-md font-mono mr-2">
-                          GET
-                        </span>
-                        <span className="font-mono">/voices</span>
-                      </div>
-                    </div>
-                    
-                    <h4 className="font-medium">Example Request</h4>
-                    <CodeBlock
-                      code={`curl -X GET https://api.voiceai.example.com/v1/voices \\
-  -H "Authorization: Bearer YOUR_API_KEY"`}
-                      language="bash"
-                    />
-                    
-                    <h4 className="font-medium mt-4">Example Response</h4>
-                    <CodeBlock
-                      code={`{
-  "voices": [
-    {
-      "id": "voice-1",
-      "name": "Emma",
-      "gender": "female",
-      "language": "en-US",
-      "category": "natural"
-    },
-    {
-      "id": "voice-2",
-      "name": "James",
-      "gender": "male",
-      "language": "en-UK",
-      "category": "natural"
-    }
-  ]
-}`}
-                      language="json"
-                    />
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-lg font-semibold">Get Voice Details</h3>
-                    <p className="text-muted-foreground mb-2">
-                      Returns details for a specific voice.
-                    </p>
-                    
-                    <div className="bg-muted rounded-md p-2 mb-4">
-                      <div className="flex items-center text-sm">
-                        <span className="bg-green-500 text-white px-2 py-1 rounded-md font-mono mr-2">
-                          GET
-                        </span>
-                        <span className="font-mono">/voices/{'{voice_id}'}</span>
-                      </div>
-                    </div>
-                    
-                    <h4 className="font-medium">Parameters</h4>
-                    <ul className="list-disc pl-5 space-y-1 mb-4">
-                      <li>
-                        <code>voice_id</code> (path) - Required. The ID of the voice to retrieve.
-                      </li>
-                    </ul>
-                    
-                    <h4 className="font-medium">Example Request</h4>
-                    <CodeBlock
-                      code={`curl -X GET https://api.voiceai.example.com/v1/voices/voice-1 \\
-  -H "Authorization: Bearer YOUR_API_KEY"`}
-                      language="bash"
-                    />
-                    
-                    <h4 className="font-medium mt-4">Example Response</h4>
-                    <CodeBlock
-                      code={`{
-  "id": "voice-1",
-  "name": "Emma",
-  "gender": "female",
-  "language": "en-US",
-  "category": "natural",
-  "description": "A warm and friendly American English female voice.",
-  "preview_url": "https://example.com/voices/emma-preview.mp3",
-  "created_at": "2023-05-01T12:00:00Z"
-}`}
-                      language="json"
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="synthesis">
-            <Card>
-              <CardHeader>
-                <CardTitle>Text to Speech API</CardTitle>
-                <CardDescription>
-                  Convert text to natural-sounding speech
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold">Authentication</h2>
+            <p>
+              No authentication is required for these API endpoints.
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold">Endpoints</h2>
+            
+            <div className="border rounded-lg overflow-hidden">
+              <div className="bg-muted p-4 border-b">
+                <h3 className="text-lg font-medium">1. Upload Reference Audio</h3>
+                <p className="text-sm text-muted-foreground">
+                  Upload an audio file to be used as a reference for voice generation.
+                </p>
+              </div>
+              <div className="p-4 space-y-4">
                 <div>
-                  <h3 className="text-lg font-semibold">Generate Speech</h3>
-                  <p className="text-muted-foreground mb-2">
-                    Converts text to speech using the specified voice.
-                  </p>
-                  
-                  <div className="bg-muted rounded-md p-2 mb-4">
-                    <div className="flex items-center text-sm">
-                      <span className="bg-blue-500 text-white px-2 py-1 rounded-md font-mono mr-2">
-                        POST
-                      </span>
-                      <span className="font-mono">/tts/generate</span>
-                    </div>
+                  <span className="inline-block bg-green-100 text-green-800 px-2 py-1 text-xs font-medium rounded">POST</span>
+                  <span className="ml-2 font-mono">/upload_audio</span>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Parameters</h4>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        <tr>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">name</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">string</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">query</td>
+                          <td className="px-6 py-4 text-sm">Speaker name (e.g., "Shashwat")</td>
+                        </tr>
+                        <tr>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">reference_text</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">string</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">query</td>
+                          <td className="px-6 py-4 text-sm">Reference text associated with the audio</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                  
-                  <h4 className="font-medium">Request Body</h4>
-                  <CodeBlock
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Request Body</h4>
+                  <p className="text-sm mb-2">Content-Type: multipart/form-data</p>
+                  <p className="text-sm">Required: Audio file</p>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Responses</h4>
+                  <p className="text-sm mb-2">200 Success:</p>
+                  <CodeBlock 
                     code={`{
-  "text": "Hello, this is a test of the text to speech API.",
-  "voice_id": "voice-1",
-  "model": "standard",
-  "language": "en-US",
-  "speed": 1.0,
-  "format": "mp3"
-}`}
-                    language="json"
+    "message": "File uploaded successfully",
+    "id": "zea3b6b2"
+}`} 
+                    language="json" 
+                    className="mb-4"
                   />
                   
-                  <h4 className="font-medium mt-4">Parameters</h4>
-                  <ul className="list-disc pl-5 space-y-2 mb-4">
-                    <li>
-                      <code>text</code> (string) - Required. The text to convert to speech.
-                    </li>
-                    <li>
-                      <code>voice_id</code> (string) - Required. The ID of the voice to use.
-                    </li>
-                    <li>
-                      <code>model</code> (string) - Optional. The TTS model to use. Options: "standard", "premium". Default: "standard".
-                    </li>
-                    <li>
-                      <code>language</code> (string) - Optional. The language code. Default is based on the selected voice.
-                    </li>
-                    <li>
-                      <code>speed</code> (number) - Optional. The speech speed. Range: 0.5-2.0. Default: 1.0.
-                    </li>
-                    <li>
-                      <code>format</code> (string) - Optional. Audio format. Options: "mp3", "wav", "ogg". Default: "mp3".
-                    </li>
-                  </ul>
-                  
-                  <h4 className="font-medium">Example Request</h4>
-                  <CodeBlock
-                    code={`curl -X POST https://api.voiceai.example.com/v1/tts/generate \\
-  -H "Authorization: Bearer YOUR_API_KEY" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "text": "Hello, this is a test of the text to speech API.",
-    "voice_id": "voice-1",
-    "model": "standard",
-    "format": "mp3"
-  }'`}
-                    language="bash"
-                  />
-                  
-                  <h4 className="font-medium mt-4">Example Response</h4>
-                  <CodeBlock
+                  <p className="text-sm mb-2">422 Validation Error:</p>
+                  <CodeBlock 
                     code={`{
-  "id": "tts-12345",
-  "status": "success",
-  "audio_url": "https://api.voiceai.example.com/v1/audio/tts-12345.mp3",
-  "duration_seconds": 3.5,
-  "created_at": "2023-06-15T10:30:00Z"
-}`}
-                    language="json"
+    "detail": [
+        {
+            "loc": ["string", 0],
+            "msg": "string",
+            "type": "string"
+        }
+    ]
+}`} 
+                    language="json" 
                   />
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Example Usage</h4>
+                  <p className="text-sm mb-2">cURL:</p>
+                  <CodeBlock 
+                    code={`curl -X 'POST' \\
+  'https://api.msganesh.com/itts/upload_audio?name=Shashwat&reference_text=Sample+text' \\
+  -H 'accept: application/json' \\
+  -F 'file=@audio.wav'`} 
+                    language="bash" 
+                    className="mb-4"
+                  />
+                  
+                  <p className="text-sm mb-2">JavaScript:</p>
+                  <CodeBlock 
+                    code={`const formData = new FormData();
+formData.append('file', audioFile);
+
+const response = await fetch(
+  'https://api.msganesh.com/itts/upload_audio?name=Shashwat&reference_text=Sample+text',
+  {
+    method: 'POST',
+    body: formData
+  }
+);
+
+const data = await response.json();
+console.log(data);`} 
+                    language="javascript" 
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="border rounded-lg overflow-hidden">
+              <div className="bg-muted p-4 border-b">
+                <h3 className="text-lg font-medium">2. Generate Speech</h3>
+                <p className="text-sm text-muted-foreground">
+                  Generate speech audio from text using a reference audio ID.
+                </p>
+              </div>
+              <div className="p-4 space-y-4">
+                <div>
+                  <span className="inline-block bg-green-100 text-green-800 px-2 py-1 text-xs font-medium rounded">POST</span>
+                  <span className="ml-2 font-mono">/generate_speech</span>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Request Body (JSON)</h4>
+                  <CodeBlock 
+                    code={`{
+    "text": "Text to be converted to speech",
+    "ref_audio_id": "2ea3b6b2"
+}`} 
+                    language="json" 
+                  />
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Responses</h4>
+                  <p className="text-sm mb-2">200 Success:</p>
+                  <CodeBlock 
+                    code={`{
+    "message": "Audio and text saved successfully",
+    "id": "597eae87"
+}`} 
+                    language="json" 
+                  />
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Example Usage</h4>
+                  <p className="text-sm mb-2">JavaScript:</p>
+                  <CodeBlock 
+                    code={`const response = await fetch('https://api.msganesh.com/itts/generate_speech', {
+  method: 'POST',
+  headers: {
+    'accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    "text": "Text to be converted to speech",
+    "ref_audio_id": "2ea3b6b2"
+  })
+});
+
+const data = await response.json();
+console.log(data);
+
+// The generated audio can be accessed at:
+// https://api.msganesh.com/itts/597eae87.wav`} 
+                    language="javascript" 
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="border rounded-lg overflow-hidden">
+              <div className="bg-muted p-4 border-b">
+                <h3 className="text-lg font-medium">3. Get Available Speakers</h3>
+                <p className="text-sm text-muted-foreground">
+                  Retrieve a list of available speakers/reference audios.
+                </p>
+              </div>
+              <div className="p-4 space-y-4">
+                <div>
+                  <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 text-xs font-medium rounded">GET</span>
+                  <span className="ml-2 font-mono">/get_speakers</span>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Responses</h4>
+                  <p className="text-sm mb-2">200 Success:</p>
+                  <CodeBlock 
+                    code={`{
+    "speakers": [
+        {
+            "name": "real",
+            "id": "b18172cd",
+            "path": "/path/to/audio.wav",
+            "reference_text": "Sample reference text"
+        },
+        {
+            "name": "Shashwat",
+            "id": "zea3bbb2",
+            "path": "/path/to/audio.wav",
+            "reference_text": "Sample reference text"
+        }
+    ]
+}`} 
+                    language="json" 
+                  />
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Example Usage</h4>
+                  <p className="text-sm mb-2">JavaScript:</p>
+                  <CodeBlock 
+                    code={`const response = await fetch('https://api.msganesh.com/itts/get_speakers', {
+  method: 'GET',
+  headers: {
+    'accept': 'application/json'
+  }
+});
+
+const data = await response.json();
+console.log(data.speakers);`} 
+                    language="javascript" 
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="border rounded-lg overflow-hidden">
+              <div className="bg-muted p-4 border-b">
+                <h3 className="text-lg font-medium">4. Download Generated Audio</h3>
+                <p className="text-sm text-muted-foreground">
+                  Download a generated audio file by its ID.
+                </p>
+              </div>
+              <div className="p-4 space-y-4">
+                <div>
+                  <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 text-xs font-medium rounded">GET</span>
+                  <span className="ml-2 font-mono">/{id}.wav</span>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Parameters</h4>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-muted">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        <tr>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">id</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">string</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">path</td>
+                          <td className="px-6 py-4 text-sm">ID of the audio file to download (required)</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Responses</h4>
+                  <p className="text-sm">200 Success: Audio file with Content-Type: audio/wav</p>
+                  <p className="text-sm">404 Not Found: If audio with given ID doesn't exist</p>
+                </div>
+                
+                <div>
+                  <h4 className="font-medium mb-2">Example Usage</h4>
+                  <p className="text-sm mb-2">JavaScript:</p>
+                  <CodeBlock 
+                    code={`// Method 1: Using fetch with a download link
+const audioId = "5070a087";
+const url = \`https://api.msganesh.com/itts/\${audioId}.wav\`;
+
+// Create a download link
+const link = document.createElement('a');
+link.href = url;
+link.download = \`audio-\${audioId}.wav\`;
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
+
+// Method 2: Using fetch to get the audio data
+const response = await fetch(url);
+const blob = await response.blob();
+const objectUrl = URL.createObjectURL(blob);
+
+// Play or download the audio
+const audio = new Audio(objectUrl);
+audio.play();`} 
+                    language="javascript" 
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold">Error Handling</h2>
+            <p>
+              All endpoints may return a 422 Validation Error with the following structure:
+            </p>
+            <CodeBlock 
+              code={`{
+    "detail": [
+        {
+            "loc": ["string", 0],
+            "msg": "string",
+            "type": "string"
+        }
+    ]
+}`} 
+              language="json" 
+            />
+          </section>
+
+          <section className="space-y-4">
+            <h2 className="text-2xl font-semibold">Additional Resources</h2>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Swagger UI documentation is available at: <a href="https://api.msganesh.com/itts/docs" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">https://api.msganesh.com/itts/docs</a></li>
+              <li>All endpoints return JSON responses unless downloading audio files</li>
+              <li>The API appears to be built with FastAPI</li>
+            </ul>
+          </section>
+        </div>
       </div>
     </DashboardLayout>
   );
