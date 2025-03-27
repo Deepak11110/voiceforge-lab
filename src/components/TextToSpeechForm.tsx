@@ -6,7 +6,8 @@ import {
   Sliders, 
   Download, 
   Copy, 
-  Save
+  Save,
+  Languages
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -38,6 +39,7 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [currentVoice, setCurrentVoice] = useState<string | null>(null);
+  const [language, setLanguage] = useState<string>('hindi');
   const [settings, setSettings] = useState({
     stability: 40,
     clarity: 75,
@@ -71,7 +73,7 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     setAudioUrl('https://audio-samples.github.io/samples/mp3/blizzard_biased/sample-1.mp3');
     
     const selectedVoiceData = voices.find(v => v.id === currentVoice);
-    toast.success(`Audio generated successfully with ${selectedVoiceData?.name || 'selected voice'}!`);
+    toast.success(`Audio generated successfully with ${selectedVoiceData?.name || 'selected voice'} in ${language}!`);
   };
   
   const handleSettingChange = (key: string, value: number) => {
@@ -96,7 +98,7 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
   const currentVoiceData = voices.find(v => v.id === currentVoice) || selectedVoice;
 
   return (
-    <div className="space-y-4 p-6 border rounded-lg w-full max-w-3xl mx-auto animate-fade-in">
+    <div className="space-y-4 p-6 border rounded-lg w-full max-w-3xl mx-auto animate-fade-in bg-white shadow-sm">
       <div className="space-y-2">
         <Label htmlFor="voice-model">Model</Label>
         <Select 
@@ -135,6 +137,30 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
       </div>
       
       <div className="space-y-2">
+        <Label htmlFor="language-select">Language</Label>
+        <Select 
+          value={language} 
+          onValueChange={setLanguage}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="hindi">Hindi</SelectItem>
+            <SelectItem value="english">English (Indian)</SelectItem>
+            <SelectItem value="tamil">Tamil</SelectItem>
+            <SelectItem value="bengali">Bengali</SelectItem>
+            <SelectItem value="telugu">Telugu</SelectItem>
+            <SelectItem value="marathi">Marathi</SelectItem>
+            <SelectItem value="punjabi">Punjabi</SelectItem>
+            <SelectItem value="malayalam">Malayalam</SelectItem>
+            <SelectItem value="gujarati">Gujarati</SelectItem>
+            <SelectItem value="kannada">Kannada</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="space-y-2">
         <div className="flex justify-between">
           <Label htmlFor="text-input">Text</Label>
           <div className="flex space-x-2">
@@ -166,10 +192,21 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
         </div>
       </div>
       
-      <div className="flex justify-between items-center">
+      {/* Generate button moved above other buttons */}
+      <Button 
+        className="w-full" 
+        size="lg"
+        disabled={!currentVoice || !text.trim() || isGenerating} 
+        onClick={handleGenerate}
+      >
+        <Play className="h-4 w-4 mr-2" />
+        {isGenerating ? 'Generating...' : 'Generate'}
+      </Button>
+      
+      <div className="flex justify-between items-center gap-2">
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" className="flex-1">
               <Sliders className="h-4 w-4 mr-2" />
               Voice Settings
             </Button>
@@ -229,37 +266,29 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
           </PopoverContent>
         </Popover>
         
-        <div className="flex space-x-2">
-          <Button 
-            variant="outline" 
-            disabled={!audioUrl || isGenerating}
-            onClick={() => toast.success('Audio saved to your library')}
-          >
-            <Save className="h-4 w-4 mr-2" />
-            Save
-          </Button>
-          
-          <Button 
-            variant="outline" 
-            disabled={!audioUrl || isGenerating}
-            onClick={() => toast.success('Audio downloaded successfully')}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Download
-          </Button>
-          
-          <Button 
-            disabled={!currentVoice || !text.trim() || isGenerating} 
-            onClick={handleGenerate}
-          >
-            <Play className="h-4 w-4 mr-2" />
-            {isGenerating ? 'Generating...' : 'Generate'}
-          </Button>
-        </div>
+        <Button 
+          variant="outline" 
+          className="flex-1"
+          disabled={!audioUrl || isGenerating}
+          onClick={() => toast.success('Audio saved to your library')}
+        >
+          <Save className="h-4 w-4 mr-2" />
+          Save
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          className="flex-1"
+          disabled={!audioUrl || isGenerating}
+          onClick={() => toast.success('Audio downloaded successfully')}
+        >
+          <Download className="h-4 w-4 mr-2" />
+          Download
+        </Button>
       </div>
       
       {audioUrl && (
-        <div className="mt-6 border rounded-lg p-4 bg-secondary/50">
+        <div className="mt-6 border rounded-lg p-4 bg-secondary/30">
           <h3 className="text-sm font-medium mb-2">Generated Audio</h3>
           <audio 
             controls 
