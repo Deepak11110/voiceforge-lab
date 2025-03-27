@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -143,7 +142,10 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
         handleReset={handleReset}
       />
       
-      {/* Generate button with improved styling */}
+      {/* Voice Settings moved above Generate button */}
+      <VoiceSettings settings={settings} handleSettingChange={handleSettingChange} />
+      
+      {/* Generate button */}
       <Button 
         className="w-full h-14 text-base font-medium shadow-sm" 
         size="lg"
@@ -154,15 +156,13 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
         {isGenerating ? 'Generating...' : 'Generate'}
       </Button>
       
-      <div className="pt-1 space-y-4">
-        <div className="flex gap-3">
-          <VoiceSettings settings={settings} handleSettingChange={handleSettingChange} />
-          <ActionButtons 
-            audioUrl={audioUrl} 
-            isGenerating={isGenerating} 
-            audioId={audioUrl ? audioUrl.split('/').pop()?.replace('.wav', '') || null : null}
-          />
-        </div>
+      {/* Action buttons below Generate */}
+      <div className="pt-1">
+        <ActionButtons 
+          audioUrl={audioUrl} 
+          isGenerating={isGenerating} 
+          audioId={audioUrl ? audioUrl.split('/').pop()?.replace('.wav', '') || null : null}
+        />
       </div>
       
       <GeneratedAudio audioUrl={audioUrl} />
