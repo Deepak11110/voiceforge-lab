@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Check } from 'lucide-react';
+import { Search, Filter, Check, Languages } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,7 @@ import TextToSpeechForm from '@/components/TextToSpeechForm';
 import { Voice } from '@/types/voice';
 import { toast } from 'sonner';
 
-// Mock data
+// Mock data with Indian voices
 const mockVoices: Voice[] = [
   {
     id: '1',
@@ -29,16 +29,17 @@ const mockVoices: Voice[] = [
     audioId: 'AUD-RF245912',
     isLegacy: false,
     tags: ['Female', 'Indian', 'Customer Service', 'Professional', 'Clear'],
+    language: 'Hindi',
     createdAt: '2023-08-15',
     recentGenerations: [
       {
         id: 'gen1',
-        text: 'Welcome to Deep Labs, how may I assist you today?',
+        text: 'नमस्ते, दीप लैब्स में आपका स्वागत है। मैं आपकी किस प्रकार सहायता कर सकती हूँ?',
         date: '2 days ago'
       },
       {
         id: 'gen2',
-        text: 'Thank you for contacting our support team.',
+        text: 'हमारी सहायता टीम से संपर्क करने के लिए धन्यवाद।',
         date: '5 days ago'
       }
     ]
@@ -52,6 +53,7 @@ const mockVoices: Voice[] = [
     audioId: 'AUD-NT187634',
     isLegacy: false,
     tags: ['Female', 'Young', 'Husky', 'Casual', 'Social'],
+    language: 'English (Indian)',
     createdAt: '2023-09-22',
     recentGenerations: [
       {
@@ -63,113 +65,114 @@ const mockVoices: Voice[] = [
   },
   {
     id: '3',
-    name: 'Rachel',
+    name: 'Anjali',
     description: 'Professional narration voice',
     category: 'Narration',
-    speakerId: 'SPKR-Rachel003',
-    audioId: 'AUD-RC123456',
-    isLegacy: true,
-    tags: ['Female', 'American', 'Professional', 'Calm', 'Narration'],
-    createdAt: '2023-05-10',
+    speakerId: 'SPKR-Anjali003',
+    audioId: 'AUD-AN123456',
+    isLegacy: false,
+    tags: ['Female', 'Indian', 'Professional', 'Calm', 'Narration'],
+    language: 'Tamil',
+    createdAt: '2023-07-10',
     recentGenerations: [
       {
         id: 'gen4',
-        text: 'In the beginning, there was darkness across the face of the deep.',
-        date: '2 months ago'
-      },
-      {
-        id: 'gen5',
-        text: 'The history of artificial intelligence begins with ancient myths and stories.',
+        text: 'தொடக்கத்தில், ஆழத்தின் முகத்தில் இருள் இருந்தது.',
         date: '2 months ago'
       }
     ]
   },
   {
     id: '4',
-    name: 'Drew',
+    name: 'Kabir',
     description: 'News reporter voice',
     category: 'News',
-    speakerId: 'SPKR-Drew004',
-    audioId: 'AUD-DW789012',
+    speakerId: 'SPKR-Kabir004',
+    audioId: 'AUD-KB789012',
     isLegacy: true,
-    tags: ['Male', 'American', 'Authoritative', 'News', 'Clear'],
+    tags: ['Male', 'Indian', 'Authoritative', 'News', 'Clear'],
+    language: 'Marathi',
     createdAt: '2023-04-18',
     recentGenerations: [
       {
         id: 'gen6',
-        text: 'Breaking news: Scientists discover a breakthrough in quantum computing.',
+        text: 'ब्रेकिंग न्यूज: शास्त्रज्ञांनी क्वांटम कॉम्प्युटिंगमध्ये एक मोठी प्रगती केली आहे.',
         date: '3 months ago'
       }
     ]
   },
   {
     id: '5',
-    name: 'Clyde',
+    name: 'Vikram',
     description: 'Character voice with personality',
     category: 'Characters',
-    speakerId: 'SPKR-Clyde005',
-    audioId: 'AUD-CL345678',
+    speakerId: 'SPKR-Vikram005',
+    audioId: 'AUD-VK345678',
     isLegacy: true,
     tags: ['Male', 'Character', 'Eccentric', 'Animated', 'Unique'],
+    language: 'Bengali',
     createdAt: '2023-03-05',
     recentGenerations: [
       {
         id: 'gen7',
-        text: 'Well well well, what do we have here? Another adventurer?',
+        text: 'আরে, আমরা এখানে কী পেয়েছি? আরেকজন অ্যাডভেঞ্চারার?',
         date: '5 months ago'
       }
     ]
   },
   {
     id: '6',
-    name: 'Paul',
+    name: 'Deepak',
     description: 'News anchor with deep tone',
     category: 'News',
-    speakerId: 'SPKR-Paul006',
-    audioId: 'AUD-PL901234',
+    speakerId: 'SPKR-Deepak006',
+    audioId: 'AUD-DP901234',
     isLegacy: true,
     tags: ['Male', 'Deep', 'Authoritative', 'News', 'Professional'],
+    language: 'Punjabi',
     createdAt: '2023-02-20',
     recentGenerations: [
       {
         id: 'gen8',
-        text: 'Good evening, our top story tonight focuses on recent developments in climate policy.',
+        text: 'ਸ਼ੁਭ ਸ਼ਾਮ, ਅੱਜ ਦੀ ਸਾਡੀ ਮੁੱਖ ਖ਼ਬਰ ਜਲਵਾਯੂ ਨੀਤੀ ਵਿੱਚ ਹਾਲੀਆ ਘਟਨਾਕ੍ਰਮ ਤੇ ਕੇਂਦ੍ਰਿਤ ਹੈ।',
         date: '4 months ago'
       }
     ]
   },
   {
     id: '7',
-    name: 'Aria',
+    name: 'Priya',
     description: 'Soft spoken social media personality',
     category: 'Social media',
-    speakerId: 'SPKR-Aria007',
-    audioId: 'AUD-AR567890',
+    speakerId: 'SPKR-Priya007',
+    audioId: 'AUD-PR567890',
     isLegacy: false,
     tags: ['Female', 'Young', 'Soft', 'Friendly', 'Social'],
+    language: 'Telugu',
     createdAt: '2023-07-12',
     recentGenerations: [
       {
         id: 'gen9',
-        text: 'Hi everyone! Today I want to share my morning routine with all of you.',
+        text: 'హాయ్ అందరికీ! నేడు నేను నా ఉదయపు దినచర్యను మీ అందరితో పంచుకోవాలనుకుంటున్నాను.',
         date: '1 month ago'
       }
     ]
   },
   {
     id: '8',
-    name: 'Domi',
+    name: 'Meera',
     description: 'Professional audiobook narrator',
     category: 'Narration',
-    speakerId: 'SPKR-Domi008',
-    audioId: 'AUD-DM123789',
+    speakerId: 'SPKR-Meera008',
+    audioId: 'AUD-MR123789',
     isLegacy: true,
     tags: ['Female', 'Mature', 'Professional', 'Audiobook', 'Expressive'],
+    language: 'Malayalam',
     createdAt: '2023-01-15',
     recentGenerations: [
       {
         id: 'gen10',
-        text: 'Chapter One. The old house stood atop the hill, silhouetted against the evening sky.',
+        text: 'അധ്യായം ഒന്ന്. പഴയ വീട് കുന്നിൻമുകളിൽ നിന്നു, സന്ധ്യാ ആകാശത്തിനെതിരെ ഒരു നിഴൽചിത്രമായി നിന്നു.',
         date: '6 months ago'
       }
     ]
@@ -184,6 +187,7 @@ const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
+  const [languageFilter, setLanguageFilter] = useState<string[]>([]);
   
   useEffect(() => {
     // Simulate API fetch
@@ -221,8 +225,13 @@ const Dashboard: React.FC = () => {
       result = result.filter(voice => categoryFilter.includes(voice.category));
     }
     
+    // Filter by language
+    if (languageFilter.length > 0) {
+      result = result.filter(voice => languageFilter.includes(voice.language));
+    }
+    
     setFilteredVoices(result);
-  }, [voices, searchQuery, activeTab, categoryFilter]);
+  }, [voices, searchQuery, activeTab, categoryFilter, languageFilter]);
   
   const handleSelectVoice = (voice: Voice) => {
     setSelectedVoice(voice);
@@ -329,6 +338,40 @@ const Dashboard: React.FC = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="gap-1">
+                      <Languages className="h-4 w-4" />
+                      <span className="hidden sm:inline">Languages</span>
+                      {languageFilter.length > 0 && (
+                        <Badge 
+                          variant="secondary" 
+                          className="ml-1 rounded-full h-5 w-5 p-0 flex items-center justify-center"
+                        >
+                          {languageFilter.length}
+                        </Badge>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {['Hindi', 'English (Indian)', 'Tamil', 'Marathi', 'Bengali', 'Punjabi', 'Telugu', 'Malayalam', 'Kannada', 'Gujarati'].map((language) => (
+                      <DropdownMenuCheckboxItem
+                        key={language}
+                        checked={languageFilter.includes(language)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setLanguageFilter(prev => [...prev, language]);
+                          } else {
+                            setLanguageFilter(prev => prev.filter(item => item !== language));
+                          }
+                        }}
+                      >
+                        {language}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                
                 <Button variant="outline">
                   Recent
                 </Button>
@@ -372,6 +415,7 @@ const Dashboard: React.FC = () => {
                     setSearchQuery('');
                     setActiveTab('all');
                     setCategoryFilter([]);
+                    setLanguageFilter([]);
                   }}>
                     Clear all filters
                   </Button>
@@ -392,7 +436,7 @@ const Dashboard: React.FC = () => {
           
           <div className="space-y-6">
             <h2 className="text-2xl font-bold tracking-tight">Text to Speech</h2>
-            <TextToSpeechForm selectedVoice={selectedVoice} />
+            <TextToSpeechForm selectedVoice={selectedVoice} voices={filteredVoices} />
           </div>
         </div>
       </main>

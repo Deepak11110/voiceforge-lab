@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Play, 
   RotateCcw, 
@@ -29,18 +29,26 @@ import { toast } from 'sonner';
 
 interface TextToSpeechFormProps {
   selectedVoice: Voice | null;
+  voices: Voice[];
 }
 
-const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice }) => {
+const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voices }) => {
   const [text, setText] = useState<string>('');
   const [model, setModel] = useState<string>('multilingual-v2');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [currentVoice, setCurrentVoice] = useState<string | null>(null);
   const [settings, setSettings] = useState({
     stability: 40,
     clarity: 75,
     style: 5
   });
+  
+  useEffect(() => {
+    if (selectedVoice) {
+      setCurrentVoice(selectedVoice.id);
+    }
+  }, [selectedVoice]);
   
   const handleGenerate = async () => {
     if (!text.trim()) {
@@ -48,7 +56,7 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice }) =>
       return;
     }
     
-    if (!selectedVoice) {
+    if (!currentVoice) {
       toast.error('Please select a voice first.');
       return;
     }
@@ -62,7 +70,8 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice }) =>
     setIsGenerating(false);
     setAudioUrl('https://audio-samples.github.io/samples/mp3/blizzard_biased/sample-1.mp3');
     
-    toast.success('Audio generated successfully!');
+    const selectedVoiceData = voices.find(v => v.id === currentVoice);
+    toast.success(`Audio generated successfully with ${selectedVoiceData?.name || 'selected voice'}!`);
   };
   
   const handleSettingChange = (key: string, value: number) => {
@@ -83,6 +92,8 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice }) =>
       style: 5
     });
   };
+  
+  const currentVoiceData = voices.find(v => v.id === currentVoice) || selectedVoice;
 
   return (
     <div className="space-y-4 p-6 border rounded-lg w-full max-w-3xl mx-auto animate-fade-in">
@@ -97,8 +108,28 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice }) =>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="multilingual-v2">Deep Multilingual v2</SelectItem>
+            <SelectItem value="indian-v1">Deep Indian v1</SelectItem>
             <SelectItem value="turbo-v2">Deep Turbo v2</SelectItem>
             <SelectItem value="english-v1">Deep English v1</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="voice-select">Voice</Label>
+        <Select 
+          value={currentVoice || ''} 
+          onValueChange={setCurrentVoice}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a voice" />
+          </SelectTrigger>
+          <SelectContent>
+            {voices.map(voice => (
+              <SelectItem key={voice.id} value={voice.id}>
+                {voice.name} ({voice.language})
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -120,14 +151,14 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice }) =>
         
         <Textarea 
           id="text-input"
-          placeholder={selectedVoice 
-            ? `Enter text to be spoken in ${selectedVoice.name}'s voice...` 
+          placeholder={currentVoiceData 
+            ? `Enter text to be spoken in ${currentVoiceData.name}'s voice (${currentVoiceData.language})...` 
             : "Select a voice first, then enter text here..."
           }
           className="min-h-[150px] resize-y"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          disabled={!selectedVoice}
+          disabled={!currentVoice}
         />
         
         <div className="text-xs text-right text-muted-foreground">
@@ -218,7 +249,7 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice }) =>
           </Button>
           
           <Button 
-            disabled={!selectedVoice || !text.trim() || isGenerating} 
+            disabled={!currentVoice || !text.trim() || isGenerating} 
             onClick={handleGenerate}
           >
             <Play className="h-4 w-4 mr-2" />

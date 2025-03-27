@@ -8,6 +8,7 @@ export interface Voice {
   audioId: string;
   isLegacy: boolean;
   tags: string[];
+  language: string;
   createdAt: string;
   recentGenerations: {
     id: string;
