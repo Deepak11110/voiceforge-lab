@@ -7,7 +7,6 @@ import { useQuery } from '@tanstack/react-query';
 import { DashboardContextType } from '@/types/dashboard';
 import { useVoiceFiltering } from '@/hooks/useVoiceFiltering';
 import { useVoiceInteraction } from '@/hooks/useVoiceInteraction';
-import { useSpeakerGroups } from '@/hooks/useSpeakerGroups';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
@@ -61,13 +60,6 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     closeDetails,
     handleVoiceCreated: interactionHandleVoiceCreated
   } = useVoiceInteraction();
-  
-  const {
-    speakerGroups,
-    createSpeakerGroup,
-    getSpeakerGroupById,
-    getSpeakersByGroupId
-  } = useSpeakerGroups(speakers);
   
   useEffect(() => {
     // Simulate API fetch for mock voices
@@ -240,7 +232,6 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     categoryFilter,
     languageFilter,
     speakers,
-    speakerGroups,
     creators,
     teams,
     isLoadingSpeakers,
@@ -258,9 +249,6 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     closeDetails,
     handleVoiceCreated,
     clearAllFilters,
-    createSpeakerGroup,
-    getSpeakerGroupById,
-    getSpeakersByGroupId,
     addCreator,
     createTeam,
     assignVoiceToCreator,
