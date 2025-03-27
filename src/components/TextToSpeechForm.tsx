@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Play } from 'lucide-react';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { Play, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Voice } from '@/types/voice';
 import { toast } from 'sonner';
@@ -36,10 +37,42 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     style: 5
   });
   
+  // Generation timer states
+  const [generationTime, setGenerationTime] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  
   // Update local voices when prop voices change
   useEffect(() => {
     setLocalVoices(propVoices);
   }, [propVoices]);
+  
+  // Timer effect
+  useEffect(() => {
+    if (timerActive) {
+      timerRef.current = setInterval(() => {
+        setGenerationTime(prev => prev + 1);
+      }, 1000);
+    } else {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+    
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [timerActive]);
+  
+  // Format time from seconds to MM:SS
+  const formatTime = (timeInSeconds: number): string => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = timeInSeconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  };
   
   // Mutation for generating speech
   const generateMutation = useMutation({
@@ -48,7 +81,8 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     onSuccess: (data) => {
       const audioUrl = voiceApi.getAudioUrl(data.id);
       setAudioUrl(audioUrl);
-      toast.success('Speech generated successfully');
+      setTimerActive(false); // Stop timer on success
+      toast.success(`Speech generated in ${formatTime(generationTime)}`);
       
       // Add to recent generations if using a real voice
       if (currentVoice) {
@@ -73,6 +107,9 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
         setVoices(updatedVoices);
       }
     },
+    onError: () => {
+      setTimerActive(false); // Stop timer on error
+    }
   });
   
   useEffect(() => {
@@ -88,6 +125,10 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     }
     
     if (currentVoice) {
+      // Reset and start the timer
+      setGenerationTime(0);
+      setTimerActive(true);
+      
       // Use API to generate speech
       generateMutation.mutate({
         text,
@@ -146,24 +187,32 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
       <VoiceSettings settings={settings} handleSettingChange={handleSettingChange} />
       
       {/* Generate button */}
-      <Button 
-        className="w-full h-14 text-base font-medium shadow-sm" 
-        size="lg"
-        disabled={!currentVoice || !text.trim() || isGenerating} 
-        onClick={handleGenerate}
-      >
-        <Play className="h-5 w-5 mr-2" />
-        {isGenerating ? 'Generating...' : 'Generate'}
-      </Button>
-      
-      {/* Action buttons below Generate */}
-      <div className="pt-1">
-        <ActionButtons 
-          audioUrl={audioUrl} 
-          isGenerating={isGenerating} 
-          audioId={audioUrl ? audioUrl.split('/').pop()?.replace('.wav', '') || null : null}
-        />
+      <div className="relative">
+        <Button 
+          className="w-full h-14 text-base font-medium shadow-sm" 
+          size="lg"
+          disabled={!currentVoice || !text.trim() || isGenerating} 
+          onClick={handleGenerate}
+        >
+          <Play className="h-5 w-5 mr-2" />
+          {isGenerating ? 'Generating...' : 'Generate'}
+        </Button>
+        
+        {/* Generation timer */}
+        {isGenerating && (
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-sm font-mono bg-primary/10 px-2 py-1 rounded">
+            <Clock className="h-3.5 w-3.5 mr-1 animate-pulse" />
+            {formatTime(generationTime)}
+          </div>
+        )}
       </div>
+      
+      {/* Action buttons below Generate as a horizontal row */}
+      <ActionButtons 
+        audioUrl={audioUrl} 
+        isGenerating={isGenerating} 
+        audioId={audioUrl ? audioUrl.split('/').pop()?.replace('.wav', '') || null : null}
+      />
       
       <GeneratedAudio audioUrl={audioUrl} />
       
