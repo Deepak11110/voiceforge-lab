@@ -49,6 +49,9 @@ const VoiceCard: React.FC<VoiceCardProps> = ({ voice, onSelect, onPlay, onView }
           {voice.isLegacy && (
             <Badge variant="outline" className="ml-2 text-xs">Legacy</Badge>
           )}
+          {voice.creatorName && voice.creatorId !== 'current' && (
+            <Badge variant="secondary" className="ml-2 text-xs">{voice.creatorName}</Badge>
+          )}
         </div>
         <p className="text-sm text-muted-foreground truncate">{voice.description}</p>
       </div>

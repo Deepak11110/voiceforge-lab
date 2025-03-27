@@ -5,6 +5,7 @@ import DashboardLayout from '@/layouts/DashboardLayout';
 import VoiceManagement from '@/components/dashboard/VoiceManagement';
 import TextToSpeechSection from '@/components/dashboard/TextToSpeechSection';
 import AssetLibrary from '@/components/dashboard/AssetLibrary';
+import CreatorManagement from '@/components/dashboard/CreatorManagement';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const Dashboard: React.FC = () => {
@@ -16,6 +17,7 @@ const Dashboard: React.FC = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
           <TabsList>
             <TabsTrigger value="voices">Voice Management</TabsTrigger>
+            <TabsTrigger value="creators">Creators & Teams</TabsTrigger>
             <TabsTrigger value="assets">Asset Library</TabsTrigger>
           </TabsList>
           
@@ -29,6 +31,10 @@ const Dashboard: React.FC = () => {
                 <TextToSpeechSection />
               </div>
             </div>
+          </TabsContent>
+          
+          <TabsContent value="creators" className="mt-6">
+            <CreatorManagement />
           </TabsContent>
           
           <TabsContent value="assets" className="mt-6">
