@@ -20,6 +20,8 @@ import { PlusCircle } from 'lucide-react';
 import { VoiceCreationProvider, useVoiceCreation } from './voice-creation/VoiceCreationContext';
 import InstantVoiceCloning from './voice-creation/InstantVoiceCloning';
 import ProfessionalVoiceCloning from './voice-creation/ProfessionalVoiceCloning';
+import { voiceApi } from '@/services/voiceApi';
+import { toast } from 'sonner';
 
 interface CreateVoiceDialogProps {
   onVoiceCreated: () => void;
@@ -30,27 +32,68 @@ const CreateVoiceDialogContent: React.FC<CreateVoiceDialogProps> = ({ onVoiceCre
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('instant');
   const [isCreating, setIsCreating] = useState(false);
-  const { formData, setFormData, setSelectedSpeakerId, setSelectedGroupId } = useVoiceCreation();
+  const { 
+    formData, 
+    setFormData, 
+    audioFile, 
+    referenceText,
+    setAudioFile,
+    setReferenceText
+  } = useVoiceCreation();
 
   const handleSubmit = async () => {
+    // Validation
+    if (!formData.name) {
+      toast.error('Please enter a voice name');
+      return;
+    }
+    
+    if (!formData.category) {
+      toast.error('Please select a voice category');
+      return;
+    }
+    
+    if (!audioFile) {
+      toast.error('Please upload an audio sample');
+      return;
+    }
+    
+    if (!referenceText) {
+      toast.error('Please enter reference text for your audio sample');
+      return;
+    }
+    
     setIsCreating(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsCreating(false);
-    setOpen(false);
-    onVoiceCreated();
-    
-    // Reset form
-    setFormData({
-      name: '',
-      description: '',
-      category: '',
-      tags: ''
-    });
-    setSelectedSpeakerId(null);
-    setSelectedGroupId(null);
+    try {
+      // Upload the audio file and create a voice
+      const uploadResponse = await voiceApi.uploadReferenceAudio(
+        audioFile,
+        formData.name,
+        referenceText
+      );
+      
+      if (uploadResponse.id) {
+        toast.success('Voice created successfully!');
+        onVoiceCreated();
+        
+        // Reset form
+        setFormData({
+          name: '',
+          description: '',
+          category: '',
+          tags: ''
+        });
+        setAudioFile(null);
+        setReferenceText('');
+        setOpen(false);
+      }
+    } catch (error) {
+      console.error('Error creating voice:', error);
+      toast.error('Failed to create voice. Please try again.');
+    } finally {
+      setIsCreating(false);
+    }
   };
 
   return (
@@ -90,7 +133,7 @@ const CreateVoiceDialogContent: React.FC<CreateVoiceDialogProps> = ({ onVoiceCre
           </Button>
           <Button 
             onClick={handleSubmit} 
-            disabled={isCreating || !formData.name || !formData.category || (activeTab === 'instant')}
+            disabled={isCreating}
           >
             {isCreating ? 'Creating...' : 'Create Voice'}
           </Button>

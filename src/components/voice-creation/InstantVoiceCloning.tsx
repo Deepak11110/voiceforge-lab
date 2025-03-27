@@ -1,44 +1,48 @@
 
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Upload, Mic, Users } from 'lucide-react';
+import { Upload, Mic } from 'lucide-react';
 import { useVoiceCreation } from './VoiceCreationContext';
-import { useDashboard } from '@/contexts/DashboardContext';
+import { toast } from 'sonner';
 
 const InstantVoiceCloning: React.FC = () => {
   const {
     formData,
     handleChange,
     handleSelectChange,
-    selectedGroupId,
-    setSelectedGroupId,
-    selectedSpeakerId,
-    setSelectedSpeakerId,
-    groupSpeakers,
-    setGroupSpeakers
+    audioFile,
+    setAudioFile,
+    referenceText,
+    setReferenceText
   } = useVoiceCreation();
   
-  const { speakerGroups, getSpeakersByGroupId } = useDashboard();
+  const [isRecording, setIsRecording] = useState(false);
   
-  useEffect(() => {
-    if (selectedGroupId) {
-      setGroupSpeakers(getSpeakersByGroupId(selectedGroupId));
-    } else {
-      setGroupSpeakers([]);
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.type.startsWith('audio/')) {
+        setAudioFile(file);
+        toast.success(`File "${file.name}" uploaded successfully`);
+      } else {
+        toast.error('Please upload an audio file');
+      }
     }
-  }, [selectedGroupId, getSpeakersByGroupId, setGroupSpeakers]);
-  
-  const handleGroupChange = (groupId: string) => {
-    setSelectedGroupId(groupId);
-    setSelectedSpeakerId(null); // Reset selected speaker when group changes
   };
   
-  const handleSpeakerSelect = (speakerId: string) => {
-    setSelectedSpeakerId(speakerId);
+  const handleRecordVoice = () => {
+    setIsRecording(!isRecording);
+    if (!isRecording) {
+      toast.info('Recording started...');
+      // This would be implemented with actual recording functionality
+    } else {
+      toast.success('Recording stopped');
+      // This would finish the recording and save it
+    }
   };
 
   return (
@@ -96,55 +100,6 @@ const InstantVoiceCloning: React.FC = () => {
         />
       </div>
       
-      {/* Speaker Group Selection */}
-      {speakerGroups.length > 0 && (
-        <div className="space-y-2">
-          <Label htmlFor="speaker-group">Speaker Group (optional)</Label>
-          <Select 
-            onValueChange={handleGroupChange}
-            value={selectedGroupId || ''}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a speaker group" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">None</SelectItem>
-              {speakerGroups.map(group => (
-                <SelectItem key={group.id} value={group.id}>
-                  {group.name} ({group.speakerIds.length} speakers)
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
-      
-      {/* Show speakers from selected group */}
-      {selectedGroupId && groupSpeakers.length > 0 && (
-        <div className="space-y-2 border rounded-lg p-4">
-          <div className="flex items-center">
-            <Users className="h-4 w-4 mr-2" />
-            <Label>Select a speaker from this group</Label>
-          </div>
-          <div className="grid grid-cols-2 gap-2 mt-2">
-            {groupSpeakers.map(speaker => (
-              <div 
-                key={speaker.id}
-                className={`p-2 border rounded-md cursor-pointer ${
-                  selectedSpeakerId === speaker.id ? 'bg-primary/20 border-primary' : ''
-                }`}
-                onClick={() => handleSpeakerSelect(speaker.id)}
-              >
-                <div className="font-medium">{speaker.name}</div>
-                <div className="text-xs text-muted-foreground truncate">
-                  {speaker.reference_text}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      
       <div className="border rounded-lg p-6 space-y-4">
         <h3 className="text-sm font-medium">Voice Sample</h3>
         <p className="text-sm text-muted-foreground">
@@ -152,15 +107,47 @@ const InstantVoiceCloning: React.FC = () => {
         </p>
         
         <div className="flex gap-4">
-          <Button variant="outline" className="flex-1">
-            <Upload className="mr-2 h-4 w-4" />
-            Upload file
+          <Button variant="outline" className="flex-1" asChild>
+            <label>
+              <Upload className="mr-2 h-4 w-4" />
+              Upload file
+              <input 
+                type="file" 
+                className="hidden" 
+                accept="audio/*"
+                onChange={handleFileUpload} 
+              />
+            </label>
           </Button>
-          <Button variant="outline" className="flex-1">
+          <Button 
+            variant="outline" 
+            className={`flex-1 ${isRecording ? 'bg-red-100' : ''}`}
+            onClick={handleRecordVoice}
+          >
             <Mic className="mr-2 h-4 w-4" />
-            Record voice
+            {isRecording ? 'Stop recording' : 'Record voice'}
           </Button>
         </div>
+        
+        {audioFile && (
+          <div className="text-sm mt-2">
+            Selected file: <span className="font-medium">{audioFile.name}</span>
+          </div>
+        )}
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="reference-text">Reference Text</Label>
+        <Textarea 
+          id="reference-text" 
+          placeholder="Enter the text that matches your audio sample" 
+          value={referenceText}
+          onChange={(e) => setReferenceText(e.target.value)}
+          className="min-h-[100px]"
+        />
+        <p className="text-xs text-muted-foreground">
+          This text should match what is spoken in your audio sample for better voice cloning results.
+        </p>
       </div>
     </div>
   );

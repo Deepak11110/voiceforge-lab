@@ -124,14 +124,24 @@ export const voiceApi = {
       id: speaker.id,
       name: speaker.name,
       description: speaker.reference_text,
-      category: 'Custom',
+      category: 'Custom', // This would ideally come from the form
       speakerId: speaker.id,
       audioId: speaker.id,
       isLegacy: false,
-      tags: ['Custom'],
+      tags: ['Custom'], // This would ideally come from the form's tags
       language: 'Custom',
       createdAt: new Date().toISOString().split('T')[0],
       recentGenerations: []
     };
+  },
+  
+  // Add a newly created voice to the voices list in the context
+  addVoiceToList: (voices: Voice[], newVoice: Voice): Voice[] => {
+    // Check if the voice already exists in the list
+    const exists = voices.some(voice => voice.id === newVoice.id);
+    if (exists) {
+      return voices;
+    }
+    return [...voices, newVoice];
   }
 };

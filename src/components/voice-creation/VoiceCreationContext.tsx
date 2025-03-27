@@ -18,6 +18,10 @@ interface VoiceCreationContextType {
   setSelectedGroupId: React.Dispatch<React.SetStateAction<string | null>>;
   groupSpeakers: Speaker[];
   setGroupSpeakers: React.Dispatch<React.SetStateAction<Speaker[]>>;
+  audioFile: File | null;
+  setAudioFile: React.Dispatch<React.SetStateAction<File | null>>;
+  referenceText: string;
+  setReferenceText: React.Dispatch<React.SetStateAction<string>>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
 }
@@ -36,6 +40,8 @@ export const VoiceCreationProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedSpeakerId, setSelectedSpeakerId] = useState<string | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [groupSpeakers, setGroupSpeakers] = useState<Speaker[]>([]);
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [referenceText, setReferenceText] = useState<string>('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -55,6 +61,10 @@ export const VoiceCreationProvider: React.FC<{ children: React.ReactNode }> = ({
     setSelectedGroupId,
     groupSpeakers,
     setGroupSpeakers,
+    audioFile,
+    setAudioFile,
+    referenceText,
+    setReferenceText,
     handleChange,
     handleSelectChange
   };

@@ -15,7 +15,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [voices, setVoices] = useState<Voice[]>([]);
   
   // Query for fetching speakers
-  const { data: speakersData, isLoading: isLoadingSpeakers } = useQuery({
+  const { data: speakersData, isLoading: isLoadingSpeakers, refetch: refetchSpeakers } = useQuery({
     queryKey: ['speakers'],
     queryFn: voiceApi.getSpeakers,
   });
@@ -46,7 +46,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     handlePlayVoice,
     handleViewVoice,
     closeDetails,
-    handleVoiceCreated
+    handleVoiceCreated: interactionHandleVoiceCreated
   } = useVoiceInteraction();
   
   const {
@@ -57,12 +57,63 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   } = useSpeakerGroups(speakers);
   
   useEffect(() => {
-    // Simulate API fetch
+    // Simulate API fetch for mock voices
     setTimeout(() => {
       setVoices(mockVoices);
       setFilteredVoices(mockVoices);
     }, 500);
+    
+    // Also fetch real speakers and convert them to voices
+    const fetchSpeakersAndCreateVoices = async () => {
+      try {
+        const fetchedSpeakers = await voiceApi.getSpeakers();
+        if (fetchedSpeakers && fetchedSpeakers.length > 0) {
+          const speakerVoices = fetchedSpeakers.map(speaker => 
+            voiceApi.createVoiceFromSpeaker(speaker)
+          );
+          
+          // Combine mock voices with speaker voices
+          setVoices(prev => {
+            const combinedVoices = [...prev];
+            speakerVoices.forEach(voice => {
+              if (!combinedVoices.some(v => v.id === voice.id)) {
+                combinedVoices.push(voice);
+              }
+            });
+            return combinedVoices;
+          });
+          
+          setFilteredVoices(prev => {
+            const combinedVoices = [...prev];
+            speakerVoices.forEach(voice => {
+              if (!combinedVoices.some(v => v.id === voice.id)) {
+                combinedVoices.push(voice);
+              }
+            });
+            return combinedVoices;
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching speakers:', error);
+      }
+    };
+    
+    fetchSpeakersAndCreateVoices();
   }, []);
+  
+  // Handle newly created voices
+  const handleVoiceCreated = async () => {
+    const newVoice = await interactionHandleVoiceCreated();
+    
+    // Refresh the speakers list
+    refetchSpeakers();
+    
+    // If a new voice was created, add it to the voices list
+    if (newVoice) {
+      setVoices(prev => voiceApi.addVoiceToList(prev, newVoice));
+      setFilteredVoices(prev => voiceApi.addVoiceToList(prev, newVoice));
+    }
+  };
 
   const value = {
     voices,
