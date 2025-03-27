@@ -26,9 +26,12 @@ export function useVoiceInteraction() {
     setDetailsVisible(false);
   };
   
-  const handleVoiceCreated = () => {
+  const handleVoiceCreated = (newVoice?: Voice) => {
     toast.success('New voice created successfully!');
     // In a real app, this would refetch the voices list
+    if (newVoice) {
+      setSelectedVoice(newVoice);
+    }
   };
 
   return {

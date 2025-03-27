@@ -32,11 +32,17 @@ const VoiceSelector: React.FC<VoiceSelectorProps> = ({
           <SelectValue placeholder="Select a voice" />
         </SelectTrigger>
         <SelectContent>
-          {voices.map(voice => (
-            <SelectItem key={voice.id} value={voice.id}>
-              {voice.name} ({voice.language})
+          {voices.length > 0 ? (
+            voices.map(voice => (
+              <SelectItem key={voice.id} value={voice.id}>
+                {voice.name} {voice.category === 'Custom' ? '(Custom)' : `(${voice.language})`}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem value="no-voices" disabled>
+              No voices available
             </SelectItem>
-          ))}
+          )}
         </SelectContent>
       </Select>
     </div>

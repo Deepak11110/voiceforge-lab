@@ -6,6 +6,7 @@ import { Voice } from '@/types/voice';
 import { toast } from 'sonner';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { voiceApi, Speaker } from '@/services/voiceApi';
+import { useDashboard } from '@/contexts/DashboardContext';
 
 // Import our components
 import ModelSelector from '@/components/text-to-speech/ModelSelector';
@@ -24,7 +25,9 @@ interface TextToSpeechFormProps {
   voices: Voice[];
 }
 
-const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voices }) => {
+const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voices: propVoices }) => {
+  const { setVoices, handleVoiceCreated } = useDashboard();
+  const [voices, setLocalVoices] = useState<Voice[]>(propVoices);
   const [text, setText] = useState<string>('');
   const [model, setModel] = useState<string>('multilingual-v2');
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -41,6 +44,11 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
   const [uploadedAudioName, setUploadedAudioName] = useState<string>('');
   const [referenceText, setReferenceText] = useState<string>('');
   
+  // Update local voices when prop voices change
+  useEffect(() => {
+    setLocalVoices(propVoices);
+  }, [propVoices]);
+  
   // Query for fetching speakers
   const { data: speakersData, isLoading: isLoadingSpeakers } = useQuery({
     queryKey: ['speakers'],
@@ -54,6 +62,28 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     onSuccess: (data) => {
       toast.success('Reference audio uploaded successfully');
       setReferenceAudioId(data.id);
+      
+      // Create a new voice from the uploaded audio
+      const newVoice = voiceApi.createVoiceFromReferenceAudio(
+        data.id,
+        uploadedAudioName,
+        referenceText || 'Sample reference text'
+      );
+      
+      // Add the new voice to the list
+      const updatedVoices = [...voices, newVoice];
+      setLocalVoices(updatedVoices);
+      setVoices(updatedVoices);
+      
+      // Select the new voice
+      setCurrentVoice(newVoice.id);
+      
+      // Reset the upload form
+      setUploadedAudioFile(null);
+      setUploadedAudioName('');
+      
+      // Notify the dashboard that a voice was created
+      handleVoiceCreated();
     },
   });
   
@@ -65,6 +95,29 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
       const audioUrl = voiceApi.getAudioUrl(data.id);
       setAudioUrl(audioUrl);
       toast.success('Speech generated successfully');
+      
+      // Add to recent generations if using a real voice
+      if (currentVoice) {
+        const updatedVoices = voices.map(voice => {
+          if (voice.id === currentVoice) {
+            return {
+              ...voice,
+              recentGenerations: [
+                {
+                  id: data.id,
+                  text: text.substring(0, 50) + (text.length > 50 ? '...' : ''),
+                  date: 'just now'
+                },
+                ...voice.recentGenerations
+              ].slice(0, 5) // Keep only the 5 most recent
+            };
+          }
+          return voice;
+        });
+        
+        setLocalVoices(updatedVoices);
+        setVoices(updatedVoices);
+      }
     },
   });
   
@@ -82,19 +135,14 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
       return;
     }
     
-    if (referenceAudioId) {
+    const voiceToUse = referenceAudioId || currentVoice;
+    
+    if (voiceToUse) {
       // Use API to generate speech
       generateMutation.mutate({
         text,
-        refAudioId: referenceAudioId,
+        refAudioId: voiceToUse,
       });
-    } else if (currentVoice) {
-      // Use mock generation for regular voices
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setAudioUrl('https://audio-samples.github.io/samples/mp3/blizzard_biased/sample-1.mp3');
-      const selectedVoiceData = voices.find(v => v.id === currentVoice);
-      toast.success(`Audio generated successfully with ${selectedVoiceData?.name || 'selected voice'} in ${language}!`);
     } else {
       toast.error('Please select a voice or upload a reference audio first.');
     }

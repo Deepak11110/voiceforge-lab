@@ -1,4 +1,5 @@
 
+import { Voice } from '@/types/voice';
 import { toast } from 'sonner';
 
 const BASE_URL = 'https://api.msganesh.com/itts';
@@ -114,4 +115,29 @@ export const voiceApi = {
   getAudioUrl: (audioId: string): string => {
     return `${BASE_URL}/${audioId}.wav`;
   },
+  
+  // Create a voice from an uploaded reference audio
+  createVoiceFromReferenceAudio: (
+    referenceAudioId: string, 
+    name: string, 
+    referenceText: string
+  ): Voice => {
+    // In a real application, this would call an API endpoint to create a voice
+    // For now, we'll create a mock voice object
+    return {
+      id: `voice-${Date.now()}`,
+      name,
+      description: `Voice created from reference audio ${referenceAudioId}`,
+      category: 'Custom',
+      speakerId: referenceAudioId,
+      audioId: referenceAudioId,
+      isLegacy: false,
+      tags: ['Custom', 'Uploaded'],
+      language: 'Custom',
+      createdAt: new Date().toISOString().split('T')[0],
+      recentGenerations: [],
+      referenceAudioId,
+      referenceText
+    } as Voice;
+  }
 };

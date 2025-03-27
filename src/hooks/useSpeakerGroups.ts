@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Speaker } from '@/services/voiceApi';
 import { SpeakerGroup } from '@/components/dashboard/SpeakerGroups';
+import { Voice } from '@/types/voice';
 
 export function useSpeakerGroups(speakers: Speaker[]) {
   const [speakerGroups, setSpeakerGroups] = useState<SpeakerGroup[]>([]);
@@ -26,11 +27,16 @@ export function useSpeakerGroups(speakers: Speaker[]) {
     
     return speakers.filter(speaker => group.speakerIds.includes(speaker.id));
   };
+  
+  const findVoicesBySpeakerId = (speakerId: string, voices: Voice[]) => {
+    return voices.filter(voice => voice.speakerId === speakerId);
+  };
 
   return {
     speakerGroups,
     createSpeakerGroup,
     getSpeakerGroupById,
-    getSpeakersByGroupId
+    getSpeakersByGroupId,
+    findVoicesBySpeakerId
   };
 }

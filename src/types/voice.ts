@@ -16,3 +16,9 @@ export interface Voice {
     date: string;
   }[];
 }
+
+// New interface to represent a voice created from uploaded audio
+export interface CreatedVoice extends Voice {
+  referenceAudioId: string;
+  referenceText?: string;
+}
