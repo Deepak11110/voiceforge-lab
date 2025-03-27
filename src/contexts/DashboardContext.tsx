@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { Voice, Creator, Team } from '@/types/voice';
 import { voiceApi } from '@/services/voiceApi';
@@ -9,6 +8,7 @@ import { useSpeakerGroups } from '@/hooks/useSpeakerGroups';
 import { useVoiceData } from '@/hooks/useVoiceData';
 import { useTeamManagement } from '@/hooks/useTeamManagement';
 import { useAuth } from '@/contexts/AuthContext';
+import { mockVoices } from '@/data/mockVoices';  // Added the missing import
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
