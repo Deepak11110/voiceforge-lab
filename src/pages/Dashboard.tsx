@@ -1,20 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Check, Languages } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuCheckboxItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import VoiceCard from '@/components/VoiceCard';
-import VoiceDetails from '@/components/VoiceDetails';
 import CreateVoiceDialog from '@/components/CreateVoiceDialog';
 import TextToSpeechForm from '@/components/TextToSpeechForm';
+import VoiceDetails from '@/components/VoiceDetails';
+import AppHeader from '@/components/dashboard/AppHeader';
+import SearchBar from '@/components/dashboard/SearchBar';
+import FilterBar from '@/components/dashboard/FilterBar';
+import TabSelector from '@/components/dashboard/TabSelector';
+import VoiceList from '@/components/dashboard/VoiceList';
 import { Voice } from '@/types/voice';
 import { toast } from 'sonner';
 
@@ -257,32 +249,16 @@ const Dashboard: React.FC = () => {
     // In a real app, this would refetch the voices list
   };
 
+  const clearAllFilters = () => {
+    setSearchQuery('');
+    setActiveTab('all');
+    setCategoryFilter([]);
+    setLanguageFilter([]);
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 sticky top-0">
-        <div className="container flex h-16 items-center justify-between">
-          <h1 className="text-xl font-semibold tracking-tight">Deep Labs</h1>
-          
-          <nav className="flex items-center gap-6">
-            <Tabs defaultValue="voices" className="w-[400px]">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="voices">Voices</TabsTrigger>
-                <TabsTrigger value="library">Library</TabsTrigger>
-                <TabsTrigger value="collections">Collections</TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </nav>
-          
-          <div className="flex items-center space-x-4">
-            <Button variant="outline">
-              Documentation
-            </Button>
-            <Button variant="outline">
-              Feedback
-            </Button>
-          </div>
-        </div>
-      </header>
+      <AppHeader />
       
       <main className="flex-1 container py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -293,145 +269,31 @@ const Dashboard: React.FC = () => {
             </div>
             
             <div className="flex flex-col md:flex-row justify-between gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search voices..." 
-                  className="pl-8" 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
+              <SearchBar 
+                searchQuery={searchQuery} 
+                setSearchQuery={setSearchQuery} 
+              />
               
-              <div className="flex gap-2 items-center">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="gap-1">
-                      <Filter className="h-4 w-4" />
-                      <span className="hidden sm:inline">Categories</span>
-                      {categoryFilter.length > 0 && (
-                        <Badge 
-                          variant="secondary" 
-                          className="ml-1 rounded-full h-5 w-5 p-0 flex items-center justify-center"
-                        >
-                          {categoryFilter.length}
-                        </Badge>
-                      )}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    {['Narration', 'Conversational', 'News', 'Characters', 'Social Media'].map((category) => (
-                      <DropdownMenuCheckboxItem
-                        key={category}
-                        checked={categoryFilter.includes(category)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setCategoryFilter(prev => [...prev, category]);
-                          } else {
-                            setCategoryFilter(prev => prev.filter(item => item !== category));
-                          }
-                        }}
-                      >
-                        {category}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="gap-1">
-                      <Languages className="h-4 w-4" />
-                      <span className="hidden sm:inline">Languages</span>
-                      {languageFilter.length > 0 && (
-                        <Badge 
-                          variant="secondary" 
-                          className="ml-1 rounded-full h-5 w-5 p-0 flex items-center justify-center"
-                        >
-                          {languageFilter.length}
-                        </Badge>
-                      )}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    {['Hindi', 'English (Indian)', 'Tamil', 'Marathi', 'Bengali', 'Punjabi', 'Telugu', 'Malayalam', 'Kannada', 'Gujarati'].map((language) => (
-                      <DropdownMenuCheckboxItem
-                        key={language}
-                        checked={languageFilter.includes(language)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setLanguageFilter(prev => [...prev, language]);
-                          } else {
-                            setLanguageFilter(prev => prev.filter(item => item !== language));
-                          }
-                        }}
-                      >
-                        {language}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                
-                <Button variant="outline">
-                  Recent
-                </Button>
-              </div>
+              <FilterBar 
+                categoryFilter={categoryFilter}
+                setCategoryFilter={setCategoryFilter}
+                languageFilter={languageFilter}
+                setLanguageFilter={setLanguageFilter}
+              />
             </div>
             
-            <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-              <TabsList className="w-full flex justify-start mb-4 bg-transparent p-0 h-9">
-                <TabsTrigger 
-                  value="all" 
-                  className="data-[state=active]:bg-secondary rounded-md px-3"
-                >
-                  All
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="personal" 
-                  className="data-[state=active]:bg-secondary rounded-md px-3"
-                >
-                  Personal
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="community" 
-                  className="data-[state=active]:bg-secondary rounded-md px-3"
-                >
-                  Community
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="default" 
-                  className="data-[state=active]:bg-secondary rounded-md px-3"
-                >
-                  Default
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+            <TabSelector 
+              activeTab={activeTab} 
+              setActiveTab={setActiveTab} 
+            />
             
-            <div className="space-y-3">
-              {filteredVoices.length === 0 ? (
-                <div className="flex flex-col items-center justify-center p-8 border border-dashed rounded-lg bg-muted/40">
-                  <p className="text-muted-foreground mb-4">No voices match your current filters.</p>
-                  <Button variant="outline" onClick={() => {
-                    setSearchQuery('');
-                    setActiveTab('all');
-                    setCategoryFilter([]);
-                    setLanguageFilter([]);
-                  }}>
-                    Clear all filters
-                  </Button>
-                </div>
-              ) : (
-                filteredVoices.map(voice => (
-                  <VoiceCard 
-                    key={voice.id}
-                    voice={voice}
-                    onSelect={handleSelectVoice}
-                    onPlay={handlePlayVoice}
-                    onView={handleViewVoice}
-                  />
-                ))
-              )}
-            </div>
+            <VoiceList 
+              voices={filteredVoices}
+              onSelectVoice={handleSelectVoice}
+              onPlayVoice={handlePlayVoice}
+              onViewVoice={handleViewVoice}
+              onClearFilters={clearAllFilters}
+            />
           </div>
           
           <div className="space-y-6">
