@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Play, Upload } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Voice } from '@/types/voice';
 import { toast } from 'sonner';
@@ -15,7 +15,9 @@ import TextInputArea from '@/components/text-to-speech/TextInputArea';
 import VoiceSettings from '@/components/text-to-speech/VoiceSettings';
 import GeneratedAudio from '@/components/text-to-speech/GeneratedAudio';
 import ActionButtons from '@/components/text-to-speech/ActionButtons';
-import { CodeBlock } from './CodeBlock';
+import ReferenceAudioUpload from '@/components/text-to-speech/ReferenceAudioUpload';
+import SpeakersDisplay from '@/components/text-to-speech/SpeakersDisplay';
+import ApiCodeBlock from '@/components/text-to-speech/ApiCodeBlock';
 
 interface TextToSpeechFormProps {
   selectedVoice: Voice | null;
@@ -34,7 +36,6 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     style: 5
   });
   const [referenceAudioId, setReferenceAudioId] = useState<string | null>(null);
-  const [speakers, setSpeakers] = useState<Speaker[]>([]);
   const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker | null>(null);
   const [uploadedAudioFile, setUploadedAudioFile] = useState<File | null>(null);
   const [uploadedAudioName, setUploadedAudioName] = useState<string>('');
@@ -73,11 +74,7 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     }
   }, [selectedVoice]);
   
-  useEffect(() => {
-    if (speakersData) {
-      setSpeakers(speakersData);
-    }
-  }, [speakersData]);
+  const speakers = speakersData || [];
   
   const handleGenerate = async () => {
     if (!text.trim()) {
@@ -146,6 +143,11 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     });
   };
   
+  const handleSelectSpeaker = (speaker: Speaker) => {
+    setSelectedSpeaker(speaker);
+    setReferenceAudioId(speaker.id);
+  };
+  
   const currentVoiceData = voices.find(v => v.id === currentVoice) || selectedVoice;
   const isGenerating = generateMutation.isPending;
   const isUploading = uploadMutation.isPending;
@@ -154,92 +156,23 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     <div className="space-y-4 p-6 border rounded-lg w-full max-w-3xl mx-auto animate-fade-in bg-white shadow-sm">
       <ModelSelector model={model} setModel={setModel} />
       
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-md font-medium">Reference Audio</h3>
-          <div className="text-xs text-muted-foreground">
-            Upload your own voice sample or select from available speakers
-          </div>
-        </div>
-        
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <input
-              type="file"
-              id="audio-file"
-              className="hidden"
-              accept="audio/*"
-              onChange={handleFileChange}
-            />
-            <label
-              htmlFor="audio-file"
-              className="flex items-center justify-center w-full p-2 border border-dashed rounded-md cursor-pointer hover:bg-muted"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              {uploadedAudioFile ? uploadedAudioFile.name : 'Choose audio file'}
-            </label>
-          </div>
-          
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Voice name"
-              className="w-full p-2 border rounded-md"
-              value={uploadedAudioName}
-              onChange={(e) => setUploadedAudioName(e.target.value)}
-            />
-          </div>
-          
-          <Button 
-            variant="outline" 
-            onClick={handleUploadAudio}
-            disabled={!uploadedAudioFile || !uploadedAudioName || isUploading}
-          >
-            {isUploading ? 'Uploading...' : 'Upload'}
-          </Button>
-        </div>
-        
-        <div className="p-2 border rounded-md">
-          <textarea
-            placeholder="Reference text (optional)"
-            className="w-full resize-none border-0 focus:ring-0 p-1"
-            rows={2}
-            value={referenceText}
-            onChange={(e) => setReferenceText(e.target.value)}
-          ></textarea>
-        </div>
-      </div>
+      <ReferenceAudioUpload 
+        uploadedAudioFile={uploadedAudioFile}
+        uploadedAudioName={uploadedAudioName}
+        referenceText={referenceText}
+        isUploading={isUploading}
+        handleFileChange={handleFileChange}
+        setUploadedAudioName={setUploadedAudioName}
+        setReferenceText={setReferenceText}
+        handleUploadAudio={handleUploadAudio}
+      />
       
-      <div className="border-t pt-4">
-        <h3 className="text-md font-medium mb-2">Available Speakers</h3>
-        {isLoadingSpeakers ? (
-          <div className="text-center p-4">Loading speakers...</div>
-        ) : speakers.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {speakers.map(speaker => (
-              <div 
-                key={speaker.id} 
-                className={`p-2 border rounded-md cursor-pointer ${
-                  selectedSpeaker?.id === speaker.id ? 'bg-primary/20 border-primary' : ''
-                }`}
-                onClick={() => {
-                  setSelectedSpeaker(speaker);
-                  setReferenceAudioId(speaker.id);
-                }}
-              >
-                <div className="font-medium">{speaker.name}</div>
-                <div className="text-xs text-muted-foreground truncate">
-                  {speaker.reference_text}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center p-4 text-muted-foreground">
-            No speakers available. Upload a reference audio to get started.
-          </div>
-        )}
-      </div>
+      <SpeakersDisplay 
+        speakers={speakers}
+        selectedSpeaker={selectedSpeaker}
+        isLoadingSpeakers={isLoadingSpeakers}
+        onSelectSpeaker={handleSelectSpeaker}
+      />
       
       <div className="border-t pt-4">
         <VoiceSelector 
@@ -281,30 +214,7 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
       
       <GeneratedAudio audioUrl={audioUrl} />
       
-      {referenceAudioId && (
-        <div className="mt-4 p-4 bg-muted rounded-md">
-          <h3 className="text-sm font-medium mb-2">API Integration Code</h3>
-          <CodeBlock
-            code={`// Generate speech using the selected reference audio
-fetch('https://api.msganesh.com/itts/generate_speech', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    text: "${text || 'Your text here'}",
-    ref_audio_id: "${referenceAudioId}"
-  })
-})
-.then(response => response.json())
-.then(data => {
-  // Access generated audio at:
-  // https://api.msganesh.com/itts/{data.id}.wav
-  console.log(data);
-})
-.catch(error => console.error('Error:', error));`}
-            language="javascript"
-          />
-        </div>
-      )}
+      <ApiCodeBlock referenceAudioId={referenceAudioId} text={text} />
     </div>
   );
 };
