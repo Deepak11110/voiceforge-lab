@@ -14,7 +14,7 @@ const Profile = () => {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout withDashboardContext={false}>
         <div className="flex items-center justify-center h-full">
           <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
         </div>
@@ -28,7 +28,7 @@ const Profile = () => {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout withDashboardContext={false}>
       <div className="container mx-auto py-6 space-y-8">
         <div className="flex flex-col md:flex-row gap-6">
           <div className="md:w-1/3">

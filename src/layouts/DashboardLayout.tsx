@@ -6,11 +6,16 @@ import { useDashboard } from '@/contexts/DashboardContext';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
+  withDashboardContext?: boolean;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
-  const { selectedVoice, detailsVisible, closeDetails } = useDashboard();
-
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
+  children, 
+  withDashboardContext = false 
+}) => {
+  // Only try to use the dashboard context if we're in a dashboard context page
+  const dashboardContext = withDashboardContext ? useDashboard() : null;
+  
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <AppHeader />
@@ -19,7 +24,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         {children}
       </main>
       
-      {detailsVisible && <VoiceDetails voice={selectedVoice} onClose={closeDetails} />}
+      {withDashboardContext && dashboardContext?.detailsVisible && (
+        <VoiceDetails 
+          voice={dashboardContext.selectedVoice} 
+          onClose={dashboardContext.closeDetails} 
+        />
+      )}
     </div>
   );
 };

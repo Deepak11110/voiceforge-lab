@@ -12,7 +12,7 @@ const Dashboard: React.FC = () => {
   
   return (
     <DashboardProvider>
-      <DashboardLayout>
+      <DashboardLayout withDashboardContext={true}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
           <TabsList>
             <TabsTrigger value="voices">Voice Management</TabsTrigger>

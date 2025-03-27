@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -118,7 +117,7 @@ const Settings = () => {
 
   if (isLoading) {
     return (
-      <DashboardLayout>
+      <DashboardLayout withDashboardContext={false}>
         <div className="flex items-center justify-center h-full">
           <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
         </div>
@@ -132,7 +131,7 @@ const Settings = () => {
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout withDashboardContext={false}>
       <div className="container mx-auto py-6 space-y-8">
         <h1 className="text-3xl font-bold">Settings</h1>
         <p className="text-muted-foreground">Manage your account settings and preferences.</p>
