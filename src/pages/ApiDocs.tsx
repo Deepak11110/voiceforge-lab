@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DashboardLayout } from '@/layouts/DashboardLayout';
+import DashboardLayout from '@/layouts/DashboardLayout';
 import { CodeBlock } from '@/components/CodeBlock';
 
 const ApiDocs: React.FC = () => {
@@ -276,7 +276,7 @@ console.log(data.speakers);`}
               <div className="p-4 space-y-4">
                 <div>
                   <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 text-xs font-medium rounded">GET</span>
-                  <span className="ml-2 font-mono">/{id}.wav</span>
+                  <span className="ml-2 font-mono">/{'{audioId}'}.wav</span>
                 </div>
                 
                 <div>
@@ -293,7 +293,7 @@ console.log(data.speakers);`}
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">id</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">audioId</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">string</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">path</td>
                           <td className="px-6 py-4 text-sm">ID of the audio file to download (required)</td>
@@ -374,3 +374,4 @@ audio.play();`}
 };
 
 export default ApiDocs;
+
