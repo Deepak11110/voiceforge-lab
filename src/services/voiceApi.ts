@@ -64,7 +64,7 @@ export const voiceApi = {
   // Generate speech from text
   generateSpeech: async (
     text: string, 
-    refAudioId: string
+    voiceId: string
   ): Promise<GenerateSpeechResponse> => {
     try {
       const response = await fetch(`${BASE_URL}/generate_speech`, {
@@ -75,7 +75,7 @@ export const voiceApi = {
         },
         body: JSON.stringify({
           text,
-          ref_audio_id: refAudioId,
+          ref_audio_id: voiceId,
         }),
       });
       
@@ -116,28 +116,22 @@ export const voiceApi = {
     return `${BASE_URL}/${audioId}.wav`;
   },
   
-  // Create a voice from an uploaded reference audio
-  createVoiceFromReferenceAudio: (
-    referenceAudioId: string, 
-    name: string, 
-    referenceText: string
+  // Create a voice from a speaker
+  createVoiceFromSpeaker: (
+    speaker: Speaker
   ): Voice => {
-    // In a real application, this would call an API endpoint to create a voice
-    // For now, we'll create a mock voice object
     return {
-      id: `voice-${Date.now()}`,
-      name,
-      description: `Voice created from reference audio ${referenceAudioId}`,
+      id: speaker.id,
+      name: speaker.name,
+      description: speaker.reference_text,
       category: 'Custom',
-      speakerId: referenceAudioId,
-      audioId: referenceAudioId,
+      speakerId: speaker.id,
+      audioId: speaker.id,
       isLegacy: false,
-      tags: ['Custom', 'Uploaded'],
+      tags: ['Custom'],
       language: 'Custom',
       createdAt: new Date().toISOString().split('T')[0],
-      recentGenerations: [],
-      referenceAudioId,
-      referenceText
-    } as Voice;
+      recentGenerations: []
+    };
   }
 };

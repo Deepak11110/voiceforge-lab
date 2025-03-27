@@ -16,8 +16,6 @@ import TextInputArea from '@/components/text-to-speech/TextInputArea';
 import VoiceSettings from '@/components/text-to-speech/VoiceSettings';
 import GeneratedAudio from '@/components/text-to-speech/GeneratedAudio';
 import ActionButtons from '@/components/text-to-speech/ActionButtons';
-import ReferenceAudioUpload from '@/components/text-to-speech/ReferenceAudioUpload';
-import SpeakersDisplay from '@/components/text-to-speech/SpeakersDisplay';
 import ApiCodeBlock from '@/components/text-to-speech/ApiCodeBlock';
 
 interface TextToSpeechFormProps {
@@ -38,59 +36,16 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     clarity: 75,
     style: 5
   });
-  const [referenceAudioId, setReferenceAudioId] = useState<string | null>(null);
-  const [selectedSpeaker, setSelectedSpeaker] = useState<Speaker | null>(null);
-  const [uploadedAudioFile, setUploadedAudioFile] = useState<File | null>(null);
-  const [uploadedAudioName, setUploadedAudioName] = useState<string>('');
-  const [referenceText, setReferenceText] = useState<string>('');
   
   // Update local voices when prop voices change
   useEffect(() => {
     setLocalVoices(propVoices);
   }, [propVoices]);
   
-  // Query for fetching speakers
-  const { data: speakersData, isLoading: isLoadingSpeakers } = useQuery({
-    queryKey: ['speakers'],
-    queryFn: voiceApi.getSpeakers,
-  });
-  
-  // Mutation for uploading reference audio
-  const uploadMutation = useMutation({
-    mutationFn: (params: { file: File; name: string; referenceText: string }) => 
-      voiceApi.uploadReferenceAudio(params.file, params.name, params.referenceText),
-    onSuccess: (data) => {
-      toast.success('Reference audio uploaded successfully');
-      setReferenceAudioId(data.id);
-      
-      // Create a new voice from the uploaded audio
-      const newVoice = voiceApi.createVoiceFromReferenceAudio(
-        data.id,
-        uploadedAudioName,
-        referenceText || 'Sample reference text'
-      );
-      
-      // Add the new voice to the list
-      const updatedVoices = [...voices, newVoice];
-      setLocalVoices(updatedVoices);
-      setVoices(updatedVoices);
-      
-      // Select the new voice
-      setCurrentVoice(newVoice.id);
-      
-      // Reset the upload form
-      setUploadedAudioFile(null);
-      setUploadedAudioName('');
-      
-      // Notify the dashboard that a voice was created
-      handleVoiceCreated();
-    },
-  });
-  
   // Mutation for generating speech
   const generateMutation = useMutation({
-    mutationFn: (params: { text: string; refAudioId: string }) => 
-      voiceApi.generateSpeech(params.text, params.refAudioId),
+    mutationFn: (params: { text: string; voiceId: string }) => 
+      voiceApi.generateSpeech(params.text, params.voiceId),
     onSuccess: (data) => {
       const audioUrl = voiceApi.getAudioUrl(data.id);
       setAudioUrl(audioUrl);
@@ -127,24 +82,20 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     }
   }, [selectedVoice]);
   
-  const speakers = speakersData || [];
-  
   const handleGenerate = async () => {
     if (!text.trim()) {
       toast.error('Please enter some text to generate speech.');
       return;
     }
     
-    const voiceToUse = referenceAudioId || currentVoice;
-    
-    if (voiceToUse) {
+    if (currentVoice) {
       // Use API to generate speech
       generateMutation.mutate({
         text,
-        refAudioId: voiceToUse,
+        voiceId: currentVoice,
       });
     } else {
-      toast.error('Please select a voice or upload a reference audio first.');
+      toast.error('Please select a voice first.');
     }
   };
   
@@ -167,60 +118,12 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
     });
   };
   
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setUploadedAudioFile(e.target.files[0]);
-    }
-  };
-  
-  const handleUploadAudio = async () => {
-    if (!uploadedAudioFile) {
-      toast.error('Please select an audio file first');
-      return;
-    }
-    
-    if (!uploadedAudioName.trim()) {
-      toast.error('Please provide a name for the voice');
-      return;
-    }
-    
-    uploadMutation.mutate({
-      file: uploadedAudioFile,
-      name: uploadedAudioName,
-      referenceText: referenceText || 'Sample reference text',
-    });
-  };
-  
-  const handleSelectSpeaker = (speaker: Speaker) => {
-    setSelectedSpeaker(speaker);
-    setReferenceAudioId(speaker.id);
-  };
-  
   const currentVoiceData = voices.find(v => v.id === currentVoice) || selectedVoice;
   const isGenerating = generateMutation.isPending;
-  const isUploading = uploadMutation.isPending;
 
   return (
     <div className="space-y-4 p-6 border rounded-lg w-full max-w-3xl mx-auto animate-fade-in bg-white shadow-sm">
       <ModelSelector model={model} setModel={setModel} />
-      
-      <ReferenceAudioUpload 
-        uploadedAudioFile={uploadedAudioFile}
-        uploadedAudioName={uploadedAudioName}
-        referenceText={referenceText}
-        isUploading={isUploading}
-        handleFileChange={handleFileChange}
-        setUploadedAudioName={setUploadedAudioName}
-        setReferenceText={setReferenceText}
-        handleUploadAudio={handleUploadAudio}
-      />
-      
-      <SpeakersDisplay 
-        speakers={speakers}
-        selectedSpeaker={selectedSpeaker}
-        isLoadingSpeakers={isLoadingSpeakers}
-        onSelectSpeaker={handleSelectSpeaker}
-      />
       
       <div className="border-t pt-4">
         <VoiceSelector 
@@ -244,7 +147,7 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
       <Button 
         className="w-full" 
         size="lg"
-        disabled={(!currentVoice && !referenceAudioId) || !text.trim() || isGenerating} 
+        disabled={!currentVoice || !text.trim() || isGenerating} 
         onClick={handleGenerate}
       >
         <Play className="h-4 w-4 mr-2" />
@@ -262,7 +165,7 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
       
       <GeneratedAudio audioUrl={audioUrl} />
       
-      <ApiCodeBlock referenceAudioId={referenceAudioId} text={text} />
+      <ApiCodeBlock referenceAudioId={currentVoice || null} text={text} />
     </div>
   );
 };
