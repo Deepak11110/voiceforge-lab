@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { DashboardProvider } from '@/contexts/DashboardContext';
 import DashboardLayout from '@/layouts/DashboardLayout';
@@ -8,7 +7,7 @@ import AssetLibrary from '@/components/dashboard/AssetLibrary';
 import CreatorManagement from '@/components/dashboard/CreatorManagement';
 import { Sidebar, SidebarProvider, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarSeparator } from '@/components/ui/sidebar';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Home, Mic, Users, FolderOpen, Settings, FileVideo, UserPlus, LayoutTemplate, User2, BrainCircuit, PaintBucket, Upload, PuzzleIcon, Flask, BadgeDollarSign, ChevronDown } from 'lucide-react';
+import { Home, Mic, Users, FolderOpen, Settings, FileVideo, UserPlus, LayoutTemplate, User2, BrainCircuit, PaintBucket, Upload, PuzzleIcon, Beaker, BadgeDollarSign, ChevronDown } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -159,7 +158,7 @@ const Dashboard: React.FC = () => {
                 
                 <SidebarMenuItem>
                   <SidebarMenuButton tooltip="Labs">
-                    <Flask className="h-5 w-5" />
+                    <Beaker className="h-5 w-5" />
                     <span>Labs</span>
                     <Badge className="ml-auto bg-indigo-100 text-indigo-800 hover:bg-indigo-100">New</Badge>
                   </SidebarMenuButton>
