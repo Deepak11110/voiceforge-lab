@@ -3,6 +3,7 @@ import React from 'react';
 import AppHeader from '@/components/dashboard/AppHeader';
 import VoiceDetails from '@/components/VoiceDetails';
 import { useDashboard } from '@/contexts/DashboardContext';
+import { SidebarInset } from '@/components/ui/sidebar';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -17,10 +18,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   const dashboardContext = withDashboardContext ? useDashboard() : null;
   
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <SidebarInset className="bg-background flex flex-col">
       <AppHeader />
       
-      <main className="flex-1 container py-6">
+      <main className="flex-1">
         {children}
       </main>
       
@@ -30,7 +31,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
           onClose={dashboardContext.closeDetails} 
         />
       )}
-    </div>
+    </SidebarInset>
   );
 };
 
