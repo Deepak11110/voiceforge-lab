@@ -33,10 +33,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   };
   
   return (
-    <>
+    <div className="flex gap-3">
       <Button 
         variant="outline" 
-        className="flex-1"
+        className="flex-1 h-11"
         disabled={!audioUrl || isGenerating}
         onClick={() => toast.success('Audio saved to your library')}
       >
@@ -46,14 +46,14 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       
       <Button 
         variant="outline" 
-        className="flex-1"
+        className="flex-1 h-11"
         disabled={!audioUrl || isGenerating}
         onClick={handleDownload}
       >
         <Download className="h-4 w-4 mr-2" />
         Download
       </Button>
-    </>
+    </div>
   );
 };
 

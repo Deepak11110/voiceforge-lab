@@ -26,7 +26,7 @@ const VoiceSettings: React.FC<VoiceSettingsProps> = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="flex-1">
+        <Button variant="outline" className="h-11 flex-1">
           <Sliders className="h-4 w-4 mr-2" />
           Voice Settings
         </Button>

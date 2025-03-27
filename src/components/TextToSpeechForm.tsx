@@ -122,7 +122,7 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
   const isGenerating = generateMutation.isPending;
 
   return (
-    <div className="space-y-4 p-6 border rounded-lg w-full max-w-3xl mx-auto animate-fade-in bg-white shadow-sm">
+    <div className="space-y-5 p-6 border rounded-lg w-full max-w-3xl mx-auto animate-fade-in bg-white shadow-sm">
       <ModelSelector model={model} setModel={setModel} />
       
       <div className="border-t pt-4">
@@ -143,24 +143,26 @@ const TextToSpeechForm: React.FC<TextToSpeechFormProps> = ({ selectedVoice, voic
         handleReset={handleReset}
       />
       
-      {/* Generate button moved above other buttons */}
+      {/* Generate button with improved styling */}
       <Button 
-        className="w-full" 
+        className="w-full h-14 text-base font-medium shadow-sm" 
         size="lg"
         disabled={!currentVoice || !text.trim() || isGenerating} 
         onClick={handleGenerate}
       >
-        <Play className="h-4 w-4 mr-2" />
+        <Play className="h-5 w-5 mr-2" />
         {isGenerating ? 'Generating...' : 'Generate'}
       </Button>
       
-      <div className="flex justify-between items-center gap-2">
-        <VoiceSettings settings={settings} handleSettingChange={handleSettingChange} />
-        <ActionButtons 
-          audioUrl={audioUrl} 
-          isGenerating={isGenerating} 
-          audioId={audioUrl ? audioUrl.split('/').pop()?.replace('.wav', '') || null : null}
-        />
+      <div className="pt-1 space-y-4">
+        <div className="flex gap-3">
+          <VoiceSettings settings={settings} handleSettingChange={handleSettingChange} />
+          <ActionButtons 
+            audioUrl={audioUrl} 
+            isGenerating={isGenerating} 
+            audioId={audioUrl ? audioUrl.split('/').pop()?.replace('.wav', '') || null : null}
+          />
+        </div>
       </div>
       
       <GeneratedAudio audioUrl={audioUrl} />
