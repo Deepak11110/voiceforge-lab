@@ -6,10 +6,32 @@ import VoiceManagement from '@/components/dashboard/VoiceManagement';
 import TextToSpeechSection from '@/components/dashboard/TextToSpeechSection';
 import AssetLibrary from '@/components/dashboard/AssetLibrary';
 import CreatorManagement from '@/components/dashboard/CreatorManagement';
-import { Sidebar, SidebarProvider, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
-import { Home, Mic, Users, FolderOpen, Settings } from 'lucide-react';
+import { 
+  Sidebar, 
+  SidebarProvider, 
+  SidebarContent, 
+  SidebarHeader, 
+  SidebarMenu, 
+  SidebarMenuItem, 
+  SidebarMenuButton,
+  SidebarFooter,
+  SidebarSeparator
+} from '@/components/ui/sidebar';
+import { 
+  Home, 
+  Mic, 
+  Users, 
+  FolderOpen, 
+  Settings,
+  LayoutDashboard,
+  FileAudio,
+  BookOpen,
+  Code,
+  LogOut
+} from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Dashboard: React.FC = () => {
   const location = useLocation();
@@ -46,24 +68,31 @@ const Dashboard: React.FC = () => {
     <DashboardProvider>
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
-          {/* Sidebar */}
+          {/* Enhanced Sidebar */}
           <Sidebar>
-            <SidebarHeader className="flex flex-col items-center justify-center py-6 gap-2">
-              <h1 className="text-2xl font-bold">Deep Labs</h1>
+            <SidebarHeader className="flex flex-col items-center justify-center py-6 gap-2 border-b border-sidebar-border">
+              <div className="flex items-center gap-2">
+                <div className="size-9 rounded-md bg-primary flex items-center justify-center">
+                  <span className="text-xl font-bold text-primary-foreground">D</span>
+                </div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Deep Labs</h1>
+              </div>
               <p className="text-sm text-muted-foreground">AI Voice Platform</p>
             </SidebarHeader>
-            <SidebarContent>
+            
+            <SidebarContent className="py-4">
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton 
                     isActive={activeSection === 'voices'}
                     onClick={() => setActiveSection('voices')}
-                    tooltip="Voices"
+                    tooltip="Voice Management"
                   >
                     <Mic className="h-5 w-5" />
-                    <span>Voices</span>
+                    <span>Voice Management</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                
                 <SidebarMenuItem>
                   <SidebarMenuButton 
                     isActive={activeSection === 'creators'}
@@ -74,6 +103,7 @@ const Dashboard: React.FC = () => {
                     <span>Creators & Teams</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                
                 <SidebarMenuItem>
                   <SidebarMenuButton 
                     isActive={activeSection === 'assets'}
@@ -84,6 +114,22 @@ const Dashboard: React.FC = () => {
                     <span>Asset Library</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                
+                <SidebarSeparator className="my-2" />
+                
+                <SidebarMenuItem>
+                  <SidebarMenuButton 
+                    asChild
+                    isActive={isActive('/api-docs')}
+                    tooltip="API Documentation"
+                  >
+                    <Link to="/api-docs">
+                      <Code className="h-5 w-5" />
+                      <span>API Docs</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                
                 <SidebarMenuItem>
                   <SidebarMenuButton 
                     asChild
@@ -98,6 +144,19 @@ const Dashboard: React.FC = () => {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarContent>
+            
+            <SidebarFooter className="mt-auto border-t border-sidebar-border py-3">
+              <div className="flex items-center px-3 py-2">
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src="https://github.com/shadcn.png" alt="User" />
+                  <AvatarFallback>JD</AvatarFallback>
+                </Avatar>
+                <div className="ml-3 space-y-1">
+                  <p className="text-sm font-medium leading-none">John Doe</p>
+                  <p className="text-xs leading-none text-muted-foreground">john@deeplabs.ai</p>
+                </div>
+              </div>
+            </SidebarFooter>
           </Sidebar>
           
           <DashboardLayout withDashboardContext={true}>
